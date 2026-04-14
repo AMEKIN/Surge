@@ -2,13 +2,7 @@
 DOMAIN-SUFFIX,goodsmilegame.com
 DOMAIN-SUFFIX,nekoconne-game.com
 DOMAIN-SUFFIX,adfurikun.jp
+DOMAIN-SUFFIX,i18n-pglstatp.com
+DOMAIN-SUFFIX,googleapis.com
 DOMAIN-KEYWORD,nekopara
 DOMAIN-KEYWORD,goodsmile
-
-# ===== 可选：CDN（按需开启）=====
-# 如果游戏加载资源慢再开
-# DOMAIN-SUFFIX,cloudfront.net
-# DOMAIN-SUFFIX,amazonaws.com
-
-# ===== 防止 QUIC 干扰（建议）=====
-DOMAIN-KEYWORD,nekopara
