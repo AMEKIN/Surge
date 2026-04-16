@@ -61,5 +61,13 @@
       "name": "Shadowrocket.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Shadowrocket.png"
     },
+    {
+      "name": "AppleCare.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/AppleCare.png"
+    },
+    {
+      "name": "AppleClassicMac.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/AppleClassicMac.png"
+    },
          ]
 }
