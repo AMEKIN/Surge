@@ -49,5 +49,17 @@
       "name": "bilibili.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/bilibili.png"
     },
+    {
+      "name": "Claude.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Claude.png"
+    },
+    {
+      "name": "DMM.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/DMM.png"
+    },
+    {
+      "name": "Shadowrocket.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Shadowrocket.png"
+    },
          ]
 }
