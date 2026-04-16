@@ -1,6 +1,6 @@
 {
   "name": "Surge自用图标库",
-  "description": "收集自用的图标库，主要用于Surge，其他平台还没用过不确定能否通用，图标尺寸为 144x144",
+  "description": "收集自用的图标库，主要用于Surge，其他平台还没用过不确定能否通用，图标尺寸为 512x512",
   "icons": [ 
     {  "name": "GoogleGemini.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/GoogleGemini.png"
@@ -8,6 +8,10 @@
     {
       "name": "ChatGPT.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/ChatGPT.png"
+    },
+    {
+      "name": "Netflix.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Netflix.png"
     },
            ]
 }
