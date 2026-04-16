@@ -1,6 +1,6 @@
 {
-  "name": "Surge自用图标库",
-  "description": "收集自用的图标库，主要用于Surge，其他平台还没用过不确定能否通用，图标尺寸为 512x512",
+  "name": "APP官方iCON合集",
+  "description": "收集自用的图标库，自用于Surge，其他平台还没用过不确定能否通用，图标尺寸为 512x512",
   "icons": [ 
     {  "name": "GoogleGemini.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/GoogleGemini.png"
@@ -13,5 +13,41 @@
       "name": "Netflix.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Netflix.png"
     },
-           ]
+    {
+      "name": "Netflix.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/AppleTV.png"
+    },
+    {
+      "name": "Disney.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Disney.png"
+    },
+    {
+      "name": "SteamMobile.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/SteamMobile.png"
+    },
+    {
+      "name": "Surge5.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Surge5.png"
+    },
+    {
+      "name": "TelegramMessenger.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/TelegramMessenger.png"
+    },
+    {
+      "name": "TikTok.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/TikTok.png"
+    },
+    {
+      "name": "Windows.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Windows.png"
+    },
+    {
+      "name": "YouTube.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/YouTube.png"
+    },
+    {
+      "name": "bilibili.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/bilibili.png"
+    },
+         ]
 }
