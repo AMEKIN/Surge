@@ -94,10 +94,6 @@
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Discord.png"
     },
     {
-      "name": "MetaAI.png",
-      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/MetaAI.png"
-    },
-    {
       "name": "Facebook.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Facebook.png"
     },
@@ -136,6 +132,10 @@
     {
       "name": "Shazam.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Shazam.png"
+    },
+    {
+      "name": "MetaAI.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/MetaAI.png"
     },
          ]
 }
