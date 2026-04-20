@@ -93,5 +93,25 @@
       "name": "Discord.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Discord.png"
     },
+    {
+      "name": "MetaAI.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/MetaAI.png"
+    },
+    {
+      "name": "Facebook.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Facebook.png"
+    },
+    {
+      "name": "Grok.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Grok.png"
+    },
+    {
+      "name": "GoogleChrome.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/GoogleChrome.png"
+    },
+    {
+      "name": "eBay.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/eBay.png"
+    },
          ]
 }
