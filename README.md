@@ -6,7 +6,7 @@
 
 目前已添加的游戏规则:
 
-1. AppleArcade
+1.  AppleArcade
 2. ネコぱら セカイコネクト
 2. ステラソラ
 
