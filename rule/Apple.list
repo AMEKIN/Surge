@@ -97,3 +97,21 @@ DOMAIN,appleid.apple.com
 DOMAIN,appleid.cdn-apple.com
 DOMAIN,gsa.apple.com
 DOMAIN,idmsa.apple.com
+
+# Apple Arcade
+   # > Game Center & Apple ID Auth (联机匹配、成就、账户验证)
+DOMAIN-SUFFIX,gsa.apple.com
+DOMAIN-SUFFIX,gamecenter.apple.com
+   # > Apple Arcade & App Store (游戏订阅、验证、下载与边缘加速节点)
+DOMAIN-KEYWORD,apple-arcade
+DOMAIN,arcade.apple.com
+DOMAIN,buy.itunes.apple.com
+DOMAIN-SUFFIX,apple-arcade.com
+DOMAIN-SUFFIX,appstore.com
+DOMAIN-SUFFIX,apps.apple.com
+DOMAIN-SUFFIX,itunes.apple.com
+DOMAIN-SUFFIX,mzstatic.com
+   # > 游戏存档、数据同步与定位 (iCloud, CloudKit & Location Services)
+DOMAIN,fmfree.icloud.com
+DOMAIN,gspe1-ssl.ls.apple.com
+
