@@ -7,4 +7,7 @@
    https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/StellaSoraJP.list
 4. ドラゴンクエストスマッシュグロウ ドラクエローグライトRPG（DoragonKuesuto）
    https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/DoragonKuesuto.list
-
+5. レリオン：NPCたちの生存記 （RELLION-NPC-Survival）
+   https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/RELLION-NPC-Survival.list
+6. Dragon Village 3
+   https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/DragonVillage3.list
