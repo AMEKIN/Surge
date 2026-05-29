@@ -11,3 +11,5 @@
    https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/RELLION-NPC-Survival.list
 6. Dragon Village 3
    https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/DragonVillage3.list
+7. メメントモリ（MementoMori: AFKRPG）
+   https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/MementoMori.list
