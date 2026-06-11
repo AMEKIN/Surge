@@ -13,3 +13,5 @@
    https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/DragonVillage3.list
 7. メメントモリ（MementoMori: AFKRPG）
    https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/MementoMori.list
+8  ドットアビス
+   https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rule/Dottoabisu.list
