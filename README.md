@@ -13,6 +13,7 @@
 5. レリオン：NPCたちの生存記 
 6. Dragon Village 3
 7. メメントモリ
+8. ドットアビス
 
 规则链接：
 https://github.com/AMEKIN/Surge/blob/main/rule/readme.md
