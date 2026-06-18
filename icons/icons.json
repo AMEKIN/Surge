@@ -145,5 +145,17 @@
       "name": "bilibiliW.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/bilibiliW.png"
     },
+    {
+      "name": "MetaHorizon.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/MetaHorizon.png"
+    },
+    {
+      "name": "DominosPizza.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/DominosPizza.png"
+    },
+    {
+      "name": "Termius.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Termius.png"
+    },
          ]
 }
