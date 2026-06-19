@@ -1,24 +1,35 @@
-// Surge Panel：网络出口检测 Enhanced
+// Surge Panel：网络出口检测 Fixed Leaf Policy
 // 功能：
 // 1. 自动读取 Surge 策略组
 // 2. 自动选择最像“主代理”的策略组
-// 3. 检测 DIRECT 出口 IP
-// 4. 检测代理组出口 IP
-// 5. 显示当前是否直连 / 代理中转
-// 6. 显示 IP 大概位置、ISP、组织、查询延迟
+// 3. 解析该策略组当前正在使用的最终节点
+// 4. 固定使用最终节点检测代理出口 IP，避免刷新时来回切换节点
+// 5. 检测 DIRECT 出口 IP
+// 6. 显示当前是否直连 / 代理中转
+// 7. 显示 IP 大概位置、ISP、组织、查询延迟
 
 const PANEL_TITLE = "网络出口检测";
 
 // 优先匹配这些关键词的策略组
-// 你可以按自己的配置继续补充，比如 “日本故障转移”、“香港智能组”
+// 注意：FINAL 如果只是最终规则组，可以保留；如果不是代理选择组，建议删掉 FINAL
 const PREFERRED_KEYWORDS = [
   "FINAL",
   "Final",
   "代理",
   "Proxy",
   "PROXY",
+  "节点",
   "手动",
   "选择",
+  "故障",
+  "转移",
+  "智能",
+  "Smart",
+  "香港",
+  "日本",
+  "台湾",
+  "新加坡",
+  "美国"
 ];
 
 // 不适合作为主代理出口检测的组
@@ -41,10 +52,10 @@ const EXCLUDE_KEYWORDS = [
   "China",
   "中国",
   "直连",
-  "下载",
+  "下载"
 ];
 
-// 多个 IP 查询接口并发，哪个最快用哪个
+// 顺序检测，避免并发请求导致策略组/负载均衡切换
 const IP_APIS = [
   {
     name: "Cloudflare Trace",
@@ -52,7 +63,7 @@ const IP_APIS = [
     type: "text",
     parse: function (text) {
       const obj = {};
-      text.split("\n").forEach(line => {
+      text.split("\n").forEach(function (line) {
         const index = line.indexOf("=");
         if (index > -1) {
           obj[line.slice(0, index)] = line.slice(index + 1);
@@ -63,9 +74,9 @@ const IP_APIS = [
         ip: obj.ip,
         country: obj.loc || "未知国家",
         region: "",
-        city: obj.colo ? `CF-${obj.colo}` : "",
+        city: obj.colo ? "CF-" + obj.colo : "",
         isp: "Cloudflare Trace",
-        org: obj.colo ? `Cloudflare Colo: ${obj.colo}` : "Cloudflare"
+        org: obj.colo ? "Cloudflare Colo: " + obj.colo : "Cloudflare"
       };
     }
   },
@@ -121,9 +132,9 @@ const IP_APIS = [
 ];
 
 function httpAPI(method, path, body) {
-  return new Promise((resolve) => {
+  return new Promise(function (resolve) {
     try {
-      $httpAPI(method, path, body || null, (result) => {
+      $httpAPI(method, path, body || null, function (result) {
         resolve(result || null);
       });
     } catch (e) {
@@ -142,7 +153,7 @@ function normalizeGroups(result) {
 
   // 兜底情况：[{"name":"xxx"}] 或 ["xxx"]
   if (Array.isArray(result)) {
-    return result.map((item) => {
+    return result.map(function (item) {
       if (typeof item === "string") return item;
       if (item && item.name) return item.name;
       return null;
@@ -156,19 +167,34 @@ function scoreGroupName(name) {
   let score = 0;
 
   for (const keyword of PREFERRED_KEYWORDS) {
-    if (name.includes(keyword)) score += 10;
+    if (name.indexOf(keyword) !== -1) score += 10;
   }
 
   for (const keyword of EXCLUDE_KEYWORDS) {
-    if (name.includes(keyword)) score -= 20;
+    if (name.indexOf(keyword) !== -1) score -= 20;
   }
 
-  // 太像规则分流组的，降低优先级
   if (/Apple|Google|Telegram|Netflix|Disney|TikTok|Bilibili|Microsoft/i.test(name)) {
     score -= 30;
   }
 
   return score;
+}
+
+function getSelectedFromResult(result) {
+  if (!result) return null;
+
+  if (typeof result === "string") {
+    return result;
+  }
+
+  // 兼容不同 Surge 版本/返回字段
+  return result.policy ||
+    result.selected ||
+    result.current ||
+    result.now ||
+    result.name ||
+    null;
 }
 
 async function getBestPolicyGroup() {
@@ -179,43 +205,93 @@ async function getBestPolicyGroup() {
     return {
       group: null,
       selected: null,
+      finalPolicy: null,
+      chain: [],
       allGroups: []
     };
   }
 
   const sorted = groups
-    .map((name, index) => ({
-      name,
-      index,
-      score: scoreGroupName(name)
-    }))
-    .sort((a, b) => {
+    .map(function (name, index) {
+      return {
+        name,
+        index,
+        score: scoreGroupName(name)
+      };
+    })
+    .sort(function (a, b) {
       if (b.score !== a.score) return b.score - a.score;
       return a.index - b.index;
     });
 
   const bestGroup = sorted[0].name;
-
-  let selected = null;
-  const selectedResult = await httpAPI(
-    "GET",
-    "/v1/policy_groups/select?group_name=" + encodeURIComponent(bestGroup),
-    null
-  );
-
-  if (selectedResult && selectedResult.policy) {
-    selected = selectedResult.policy;
-  }
+  const resolved = await resolveFinalPolicy(bestGroup, groups);
 
   return {
     group: bestGroup,
-    selected,
+    selected: resolved.selected,
+    finalPolicy: resolved.finalPolicy,
+    chain: resolved.chain,
     allGroups: groups
   };
 }
 
+// 递归解析：策略组 -> 当前子策略 -> 如果还是策略组继续解析 -> 最终节点
+async function resolveFinalPolicy(startGroup, allGroups) {
+  const groupSet = {};
+  allGroups.forEach(function (name) {
+    groupSet[name] = true;
+  });
+
+  let current = startGroup;
+  let selected = null;
+  let finalPolicy = startGroup;
+  const chain = [startGroup];
+  const visited = {};
+
+  for (let i = 0; i < 10; i++) {
+    if (!current || visited[current]) break;
+    visited[current] = true;
+
+    const result = await httpAPI(
+      "GET",
+      "/v1/policy_groups/select?group_name=" + encodeURIComponent(current),
+      null
+    );
+
+    const next = getSelectedFromResult(result);
+
+    if (!next) {
+      finalPolicy = current;
+      break;
+    }
+
+    if (!selected) {
+      selected = next;
+    }
+
+    chain.push(next);
+
+    // 如果 next 不是策略组名，说明它大概率已经是最终节点名
+    if (!groupSet[next]) {
+      finalPolicy = next;
+      break;
+    }
+
+    // 如果 next 还是策略组，继续往下解析
+    current = next;
+    finalPolicy = next;
+  }
+
+  return {
+    selected,
+    finalPolicy,
+    chain
+  };
+}
+
 function requestOneAPI(api, policy) {
-  return new Promise((resolve) => {
+  return new Promise(function (resolve) {
     const start = Date.now();
 
     const option = {
@@ -230,7 +306,7 @@ function requestOneAPI(api, policy) {
       option.policy = policy;
     }
 
-    $httpClient.get(option, (error, response, data) => {
+    $httpClient.get(option, function (error, response, data) {
       const ms = Date.now() - start;
 
       if (error) {
@@ -285,37 +361,30 @@ function requestOneAPI(api, policy) {
   });
 }
 
-function queryIP(policy) {
-  return new Promise((resolve) => {
-    let finished = false;
-    let failed = [];
-    let pending = IP_APIS.length;
+// 顺序 fallback：先 Cloudflare，再 ip-api，再 ip.sb，再 ipify
+async function queryIP(policy) {
+  const failed = [];
 
-    for (const api of IP_APIS) {
-      requestOneAPI(api, policy).then((result) => {
-        if (finished) return;
+  for (const api of IP_APIS) {
+    const result = await requestOneAPI(api, policy);
 
-        if (result.ok) {
-          finished = true;
-          resolve(result);
-          return;
-        }
-
-        failed.push(result);
-        pending -= 1;
-
-        if (pending <= 0) {
-          finished = true;
-          resolve({
-            ok: false,
-            policy,
-            error: failed.map(x => `${x.api}: ${x.error}`).join("\n"),
-            ms: Math.max.apply(null, failed.map(x => x.ms || 0))
-          });
-        }
-      });
+    if (result.ok) {
+      return result;
     }
-  });
+
+    failed.push(result);
+  }
+
+  return {
+    ok: false,
+    policy,
+    error: failed.map(function (x) {
+      return x.api + ": " + x.error;
+    }).join("\n"),
+    ms: Math.max.apply(null, failed.map(function (x) {
+      return x.ms || 0;
+    }))
+  };
 }
 
 function formatLocation(info) {
@@ -325,25 +394,27 @@ function formatLocation(info) {
 
 function formatInfo(title, info) {
   if (!info.ok) {
-    return `${title}
-状态：失败
-错误：${info.error || "未知错误"}
-延迟：${info.ms || "-"}ms`;
+    return title + "\n" +
+      "状态：失败\n" +
+      "错误：" + (info.error || "未知错误") + "\n" +
+      "延迟：" + (info.ms || "-") + "ms";
   }
 
-  return `${title}
-IP：${info.ip}
-位置：${formatLocation(info)}
-ISP：${info.isp}
-组织：${info.org}
-接口：${info.api}
-延迟：${info.ms}ms`;
+  return title + "\n" +
+    "IP：" + info.ip + "\n" +
+    "位置：" + formatLocation(info) + "\n" +
+    "ISP：" + info.isp + "\n" +
+    "组织：" + info.org + "\n" +
+    "接口：" + info.api + "\n" +
+    "延迟：" + info.ms + "ms";
 }
 
 async function main() {
   const policyInfo = await getBestPolicyGroup();
   const proxyGroup = policyInfo.group;
-  const selectedPolicy = policyInfo.selected;
+  const firstSelected = policyInfo.selected;
+  const finalPolicy = policyInfo.finalPolicy;
+  const chain = policyInfo.chain || [];
 
   if (!proxyGroup) {
     const directOnly = await queryIP("DIRECT");
@@ -363,8 +434,10 @@ async function main() {
 
   const directPromise = queryIP("DIRECT");
 
-  // 重点：这里使用自动识别到的真实策略组名，不再写死 PROXY
-  const proxyPromise = queryIP(proxyGroup);
+  // 关键修改：
+  // 这里不再使用 proxyGroup，而是使用最终解析出来的 finalPolicy。
+  // 这样可以固定检测当前正在使用的节点，避免每次刷新都触发策略组重新选择。
+  const proxyPromise = queryIP(finalPolicy);
 
   const results = await Promise.all([directPromise, proxyPromise]);
   const direct = results[0];
@@ -392,14 +465,24 @@ async function main() {
     style = "error";
   }
 
-  const selectedText = selectedPolicy
-    ? `当前子策略：${selectedPolicy}`
-    : "当前子策略：自动组 / 非手动选择组 / 未返回";
+  const selectedText = firstSelected
+    ? "当前子策略：" + firstSelected
+    : "当前子策略：未返回";
+
+  const finalText = finalPolicy
+    ? "固定检测节点：" + finalPolicy
+    : "固定检测节点：未解析";
+
+  const chainText = chain.length
+    ? "策略链路：" + chain.join(" → ")
+    : "策略链路：未解析";
 
   const content = [
-    `当前路径：${mode}`,
-    `检测策略组：${proxyGroup}`,
+    "当前路径：" + mode,
+    "检测策略组：" + proxyGroup,
     selectedText,
+    finalText,
+    chainText,
     "",
     formatInfo("本地直连出口", direct),
     "",
