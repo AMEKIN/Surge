@@ -1,8 +1,32 @@
-// 修改成你 Surge 里的策略组名称
-const PROXY_POLICY = "PROXY";
+// Surge Panel：网络出口检测
+// 自动读取第一个策略组，并检测 DIRECT 与代理出口 IP
 
-// IP 查询接口
 const API = "https://ipwho.is/";
+
+function httpAPI(method, path, body = null) {
+  return new Promise((resolve) => {
+    $httpAPI(method, path, body, (result) => {
+      resolve(result);
+    });
+  });
+}
+
+async function getFirstPolicyGroup() {
+  try {
+    const result = await httpAPI("GET", "/v1/policy_groups");
+
+    const groups = Object.keys(result || {});
+
+    // 排除一些明显不适合作为代理出口检测的组名
+    const blacklist = ["DIRECT", "REJECT", "REJECT-DROP", "GLOBAL"];
+
+    const usableGroups = groups.filter(name => !blacklist.includes(name));
+
+    return usableGroups[0] || groups[0] || null;
+  } catch (e) {
+    return null;
+  }
+}
 
 function queryIP(policy) {
   return new Promise((resolve) => {
@@ -11,7 +35,7 @@ function queryIP(policy) {
     $httpClient.get(
       {
         url: API,
-        policy: policy,
+        policy,
         timeout: 8,
         headers: {
           "User-Agent": "Surge Network Path Panel"
@@ -41,8 +65,7 @@ function queryIP(policy) {
             region: json.region || "未知地区",
             city: json.city || "未知城市",
             isp: json.connection?.isp || "未知 ISP",
-            org: json.connection?.org || "",
-            timezone: json.timezone?.id || "",
+            org: json.connection?.org || "未知组织",
             ms
           });
         } catch (e) {
@@ -60,21 +83,39 @@ function queryIP(policy) {
 
 function formatInfo(title, info) {
   if (!info.ok) {
-    return `${title}\n状态：失败\n错误：${info.error}\n延迟：${info.ms}ms`;
+    return `${title}
+策略：${info.policy}
+状态：失败
+错误：${info.error}
+延迟：${info.ms}ms`;
   }
 
   return `${title}
+策略：${info.policy}
 IP：${info.ip}
 位置：${info.country} ${info.region} ${info.city}
 ISP：${info.isp}
-组织：${info.org || "未知"}
+组织：${info.org}
 延迟：${info.ms}ms`;
 }
 
-Promise.all([
-  queryIP("DIRECT"),
-  queryIP(PROXY_POLICY)
-]).then(([direct, proxy]) => {
+async function main() {
+  const proxyPolicy = await getFirstPolicyGroup();
+
+  if (!proxyPolicy) {
+    $done({
+      title: "网络出口检测",
+      content: "未能读取到 Surge 策略组。\n请检查 Surge HTTP API 是否可用。",
+      style: "error"
+    });
+    return;
+  }
+
+  const [direct, proxy] = await Promise.all([
+    queryIP("DIRECT"),
+    queryIP(proxyPolicy)
+  ]);
+
   let mode = "未知";
   let style = "info";
 
@@ -86,20 +127,24 @@ Promise.all([
       mode = "代理 / 中转";
       style = "good";
     }
-  } else if (proxy.ok) {
-    mode = "代理检测成功，直连检测失败";
+  } else if (direct.ok && !proxy.ok) {
+    mode = "代理检测失败";
+    style = "error";
+  } else if (!direct.ok && proxy.ok) {
+    mode = "直连检测失败，代理检测成功";
     style = "info";
   } else {
-    mode = "检测失败";
+    mode = "全部检测失败";
     style = "error";
   }
 
   const content = [
+    `当前策略组：${proxyPolicy}`,
     `当前路径：${mode}`,
     "",
     formatInfo("本地直连出口", direct),
     "",
-    formatInfo(`代理出口：${PROXY_POLICY}`, proxy)
+    formatInfo("代理出口检测", proxy)
   ].join("\n");
 
   $done({
@@ -107,4 +152,6 @@ Promise.all([
     content,
     style
   });
-});
+}
+
+main();
