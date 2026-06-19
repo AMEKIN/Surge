@@ -8,8 +8,8 @@ const PANEL_TITLE = "网络出口检测";
 
 const TARGET_GROUP = "FINAL";
 
-const SAMPLE_COUNT = 5;
-const SAMPLE_INTERVAL_MS = 250;
+const SAMPLE_COUNT = 3;
+const SAMPLE_INTERVAL_MS = 80;
 
 const PREFERRED_KEYWORDS = [
   "代理", "Proxy", "PROXY", "节点", "手动", "选择", "故障", "转移",
@@ -93,7 +93,7 @@ const IP_APIS = [
   }
 ];
 
-const QUALITY_TEST_URL = "https://cp.cloudflare.com/generate_204";
+const QUALITY_TEST_URL = "http://connectivitycheck.gstatic.com/generate_204";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
