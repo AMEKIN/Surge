@@ -58,8 +58,51 @@ const EXCLUDE_KEYWORDS = [
 // 多个 IP 查询接口并发，哪个最快用哪个
 const IP_APIS = [
   {
+    name: "Cloudflare Trace",
+    url: "https://www.cloudflare.com/cdn-cgi/trace",
+    type: "text",
+    parse: function (text) {
+      const obj = {};
+      text.split("\n").forEach(line => {
+        const index = line.indexOf("=");
+        if (index > -1) {
+          obj[line.slice(0, index)] = line.slice(index + 1);
+        }
+      });
+
+      return {
+        ip: obj.ip,
+        country: obj.loc || "未知国家",
+        region: "",
+        city: obj.colo ? `CF-${obj.colo}` : "",
+        isp: "Cloudflare Trace",
+        org: obj.colo ? `Cloudflare Colo: ${obj.colo}` : "Cloudflare"
+      };
+    }
+  },
+  {
+    name: "ip-api",
+    url: "http://ip-api.com/json/?lang=zh-CN&fields=status,message,country,regionName,city,isp,org,query",
+    type: "json",
+    parse: function (json) {
+      if (json.status && json.status !== "success") {
+        throw new Error(json.message || "ip-api 查询失败");
+      }
+
+      return {
+        ip: json.query,
+        country: json.country,
+        region: json.regionName,
+        city: json.city,
+        isp: json.isp,
+        org: json.org
+      };
+    }
+  },
+  {
     name: "ip.sb",
     url: "https://api.ip.sb/geoip",
+    type: "json",
     parse: function (json) {
       return {
         ip: json.ip,
@@ -72,44 +115,17 @@ const IP_APIS = [
     }
   },
   {
-    name: "ipwho.is",
-    url: "https://ipwho.is/",
+    name: "ipify",
+    url: "https://api.ipify.org?format=json",
+    type: "json",
     parse: function (json) {
       return {
         ip: json.ip,
-        country: json.country,
-        region: json.region,
-        city: json.city,
-        isp: json.connection && json.connection.isp,
-        org: json.connection && json.connection.org
-      };
-    }
-  },
-  {
-    name: "ipapi.co",
-    url: "https://ipapi.co/json/",
-    parse: function (json) {
-      return {
-        ip: json.ip,
-        country: json.country_name,
-        region: json.region,
-        city: json.city,
-        isp: json.org,
-        org: json.asn || ""
-      };
-    }
-  },
-  {
-    name: "ipinfo.io",
-    url: "https://ipinfo.io/json",
-    parse: function (json) {
-      return {
-        ip: json.ip,
-        country: json.country,
-        region: json.region,
-        city: json.city,
-        isp: json.org,
-        org: json.hostname || ""
+        country: "仅 IP 检测",
+        region: "",
+        city: "",
+        isp: "未知 ISP",
+        org: "ipify fallback"
       };
     }
   }
@@ -215,7 +231,7 @@ function requestOneAPI(api, policy) {
 
     const option = {
       url: api.url,
-      timeout: 5,
+      timeout: 4,
       headers: {
         "User-Agent": "Surge Network Path Panel"
       }
@@ -240,8 +256,9 @@ function requestOneAPI(api, policy) {
       }
 
       try {
-        const json = JSON.parse(data);
-        const parsed = api.parse(json);
+        const parsed = api.type === "text"
+          ? api.parse(data)
+          : api.parse(JSON.parse(data));
 
         if (!parsed || !parsed.ip) {
           resolve({
@@ -271,7 +288,7 @@ function requestOneAPI(api, policy) {
           ok: false,
           api: api.name,
           policy,
-          error: "JSON 解析失败",
+          error: "解析失败：" + e.message,
           ms
         });
       }
