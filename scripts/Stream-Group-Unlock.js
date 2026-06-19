@@ -445,13 +445,15 @@ function withTimeout(promise, ms) {
 
 // Netflix 检测：
 // 81280792 用于检测非自制片库，80018499 用于自制内容兜底。
+// 地区识别优化：优先读取跳转 Location，其次读取页面字段，最后用出口 IP 地区兜底。
 async function checkNetflix(policy) {
   const full = await netflixInner(policy, "81280792");
 
   if (full.status === "ok") {
+    const region = await getNetflixDisplayRegion(policy, full.region);
     return {
       ok: true,
-      text: `✅ 完整解锁 ${full.region}`,
+      text: `✅ 完整解锁 ${region}`,
     };
   }
 
@@ -466,9 +468,10 @@ async function checkNetflix(policy) {
     const original = await netflixInner(policy, "80018499");
 
     if (original.status === "ok") {
+      const region = await getNetflixDisplayRegion(policy, original.region);
       return {
         ok: true,
-        text: `⚠️ 仅自制剧 ${original.region}`,
+        text: `⚠️ 仅自制剧 ${region}`,
       };
     }
 
@@ -487,30 +490,74 @@ async function checkNetflix(policy) {
 }
 
 async function netflixInner(policy, filmId) {
-  const res = await request(
-    "GET",
-    `https://www.netflix.com/title/${filmId}`,
-    policy
-  );
+  const url = `https://www.netflix.com/title/${filmId}`;
 
+  // 先关闭自动跳转，用来抓 Location 里的地区路径，例如 /hk/title/xxxx
+  const first = await request("GET", url, policy, {
+    autoRedirect: false,
+    headers: REQUEST_HEADERS,
+  });
+
+  if (!first.ok) return { status: "error" };
+
+  if (first.status === 403) return { status: "blocked" };
+  if (first.status === 404) return { status: "not_found" };
+
+  const location =
+    getHeader(first.headers, "location") ||
+    getHeader(first.headers, "x-originating-url") ||
+    "";
+
+  const regionFromLocation = extractNetflixRegion(location);
+
+  if (first.status >= 300 && first.status < 400) {
+    if (regionFromLocation) {
+      return {
+        status: "ok",
+        region: regionFromLocation,
+      };
+    }
+
+    // 如果有跳转地址但没识别到地区，再跟随一次
+    if (location) {
+      const followUrl = location.startsWith("http")
+        ? location
+        : `https://www.netflix.com${location}`;
+
+      const second = await request("GET", followUrl, policy, {
+        autoRedirect: true,
+        headers: REQUEST_HEADERS,
+      });
+
+      return parseNetflixResponse(second, location);
+    }
+
+    return { status: "error" };
+  }
+
+  return parseNetflixResponse(first, location);
+}
+
+function parseNetflixResponse(res, extraText) {
   if (!res.ok) return { status: "error" };
 
   if (res.status === 403) return { status: "blocked" };
   if (res.status === 404) return { status: "not_found" };
 
   if (res.status === 200) {
-    let region = "未知";
+    const headerText = [
+      getHeader(res.headers, "location"),
+      getHeader(res.headers, "x-originating-url"),
+      getHeader(res.headers, "content-location"),
+      extraText || "",
+    ].join("\n");
 
-    const originUrl = getHeader(res.headers, "x-originating-url");
-    if (originUrl) {
-      const match = originUrl.match(/netflix\.com\/([a-z]{2})\//i);
-      if (match && match[1]) region = match[1].toUpperCase();
-    }
+    const bodyText = String(res.data || "");
 
-    if (region === "未知") {
-      const htmlMatch = String(res.data).match(/"countryCode"\s*:\s*"([A-Z]{2})"/i);
-      if (htmlMatch && htmlMatch[1]) region = htmlMatch[1].toUpperCase();
-    }
+    const region =
+      extractNetflixRegion(headerText) ||
+      extractNetflixRegion(bodyText) ||
+      "";
 
     return {
       status: "ok",
@@ -519,6 +566,80 @@ async function netflixInner(policy, filmId) {
   }
 
   return { status: "error" };
+}
+
+async function getNetflixDisplayRegion(policy, region) {
+  if (region) return region;
+
+  const geo = await getGeoFallback(policy);
+
+  // 星号代表这是出口 IP 地区兜底，不是 Netflix 页面明确返回的地区
+  if (geo) return `${geo}*`;
+
+  return "未知";
+}
+
+function extractNetflixRegion(text) {
+  const s = String(text || "");
+
+  const patterns = [
+    /netflix\.com\/([a-z]{2})\/title/i,
+    /netflix\.com\/[a-z]{2}-([a-z]{2})\/title/i,
+    /"countryCode"\s*:\s*"([A-Z]{2})"/i,
+    /"country"\s*:\s*"([A-Z]{2})"/i,
+    /"geoCountry"\s*:\s*"([A-Z]{2})"/i,
+    /"requestCountry"\s*:\s*"([A-Z]{2})"/i,
+    /"currentCountry"\s*:\s*"([A-Z]{2})"/i,
+    /"countryOfSignup"\s*:\s*"([A-Z]{2})"/i,
+    /"preferredLocale"\s*:\s*"[a-z]{2}-([A-Z]{2})"/i,
+    /"locale"\s*:\s*"[a-z]{2}-([A-Z]{2})"/i,
+  ];
+
+  for (const p of patterns) {
+    const m = s.match(p);
+    if (m && m[1]) {
+      const region = m[1].toUpperCase();
+
+      // 避免把 /en/title 这种语言路径误判成 EN 地区
+      if (["EN", "ZH", "JA", "KO", "FR", "DE", "ES", "IT", "PT"].includes(region)) {
+        continue;
+      }
+
+      return region;
+    }
+  }
+
+  return "";
+}
+
+async function getGeoFallback(policy) {
+  const apis = [
+    "http://ip-api.com/json/?fields=status,countryCode",
+    "https://ipapi.co/json/",
+  ];
+
+  for (const url of apis) {
+    const res = await request("GET", url, policy, {
+      timeout: 5,
+      headers: REQUEST_HEADERS,
+    });
+
+    if (!res.ok || res.status !== 200) continue;
+
+    try {
+      const json = JSON.parse(res.data || "{}");
+
+      if (json.countryCode) {
+        return String(json.countryCode).toUpperCase();
+      }
+
+      if (json.country_code) {
+        return String(json.country_code).toUpperCase();
+      }
+    } catch (_) {}
+  }
+
+  return "";
 }
 
 // YouTube Premium 检测
