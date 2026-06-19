@@ -1,0 +1,9 @@
+#!name=网络出口检测
+#!desc=显示本地直连 IP、代理出口 IP、地理位置，并判断当前是否中转
+#!system=ios
+
+[Script]
+NetworkPath = type=generic,timeout=15,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/main/scripts/network-path.js
+
+[Panel]
+网络出口检测 = script-name=NetworkPath,update-interval=300
