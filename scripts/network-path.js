@@ -1,5 +1,5 @@
 // 修改成你 Surge 里的策略组名称
-const PROXY_POLICY = "FINAL";
+const PROXY_POLICY = "PROXY";
 
 // IP 查询接口
 const API = "https://ipwho.is/";
