@@ -6,4 +6,4 @@
 NetworkPath = type=generic,timeout=15,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/main/scripts/network-path.js
 
 [Panel]
-网络出口质量检测 = script-name=NetworkPath,update-interval=300
+网络出口质量检测 = script-name=NetworkPath,update-interval=86400
