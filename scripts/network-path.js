@@ -1,127 +1,375 @@
-// Surge Panel：网络出口检测
-// 自动读取第一个策略组，并检测 DIRECT 与代理出口 IP
+// Surge Panel：网络出口检测 Enhanced
+// 功能：
+// 1. 自动读取 Surge 策略组
+// 2. 自动选择最像“主代理”的策略组
+// 3. 检测 DIRECT 出口 IP
+// 4. 检测代理组出口 IP
+// 5. 显示当前是否直连 / 代理中转
+// 6. 显示 IP 大概位置、ISP、组织、查询延迟
 
-const API = "https://ipwho.is/";
+const PANEL_TITLE = "网络出口检测";
 
-function httpAPI(method, path, body = null) {
+// 优先匹配这些关键词的策略组
+// 你可以按自己的配置继续补充，比如 “日本故障转移”、“香港智能组”
+const PREFERRED_KEYWORDS = [
+  "节点",
+  "代理",
+  "Proxy",
+  "PROXY",
+  "故障",
+  "转移",
+  "智能",
+  "Smart",
+  "手动",
+  "选择",
+  "机场",
+  "香港",
+  "日本",
+  "台湾",
+  "新加坡",
+  "美国"
+];
+
+// 不适合作为主代理出口检测的组
+const EXCLUDE_KEYWORDS = [
+  "Apple",
+  "苹果",
+  "Microsoft",
+  "微软",
+  "Google",
+  "YouTube",
+  "Telegram",
+  "Netflix",
+  "Disney",
+  "TikTok",
+  "Bilibili",
+  "哔哩",
+  "广告",
+  "AdBlock",
+  "Domestic",
+  "China",
+  "中国",
+  "直连",
+  "下载",
+  "Final",
+  "FINAL"
+];
+
+// 多个 IP 查询接口并发，哪个最快用哪个
+const IP_APIS = [
+  {
+    name: "ip.sb",
+    url: "https://api.ip.sb/geoip",
+    parse: function (json) {
+      return {
+        ip: json.ip,
+        country: json.country,
+        region: json.region,
+        city: json.city,
+        isp: json.isp,
+        org: json.organization || json.asn_organization || ""
+      };
+    }
+  },
+  {
+    name: "ipwho.is",
+    url: "https://ipwho.is/",
+    parse: function (json) {
+      return {
+        ip: json.ip,
+        country: json.country,
+        region: json.region,
+        city: json.city,
+        isp: json.connection && json.connection.isp,
+        org: json.connection && json.connection.org
+      };
+    }
+  },
+  {
+    name: "ipapi.co",
+    url: "https://ipapi.co/json/",
+    parse: function (json) {
+      return {
+        ip: json.ip,
+        country: json.country_name,
+        region: json.region,
+        city: json.city,
+        isp: json.org,
+        org: json.asn || ""
+      };
+    }
+  },
+  {
+    name: "ipinfo.io",
+    url: "https://ipinfo.io/json",
+    parse: function (json) {
+      return {
+        ip: json.ip,
+        country: json.country,
+        region: json.region,
+        city: json.city,
+        isp: json.org,
+        org: json.hostname || ""
+      };
+    }
+  }
+];
+
+function httpAPI(method, path, body) {
   return new Promise((resolve) => {
-    $httpAPI(method, path, body, (result) => {
-      resolve(result);
-    });
+    try {
+      $httpAPI(method, path, body || null, (result) => {
+        resolve(result || null);
+      });
+    } catch (e) {
+      resolve(null);
+    }
   });
 }
 
-async function getFirstPolicyGroup() {
-  try {
-    const result = await httpAPI("GET", "/v1/policy_groups");
+function normalizeGroups(result) {
+  if (!result) return [];
 
-    const groups = Object.keys(result || {});
-
-    // 排除一些明显不适合作为代理出口检测的组名
-    const blacklist = ["DIRECT", "REJECT", "REJECT-DROP", "GLOBAL"];
-
-    const usableGroups = groups.filter(name => !blacklist.includes(name));
-
-    return usableGroups[0] || groups[0] || null;
-  } catch (e) {
-    return null;
+  // 常见情况：{ "策略组A": [...], "策略组B": [...] }
+  if (typeof result === "object" && !Array.isArray(result)) {
+    return Object.keys(result);
   }
+
+  // 兜底情况：[{"name":"xxx"}] 或 ["xxx"]
+  if (Array.isArray(result)) {
+    return result.map((item) => {
+      if (typeof item === "string") return item;
+      if (item && item.name) return item.name;
+      return null;
+    }).filter(Boolean);
+  }
+
+  return [];
 }
 
-function queryIP(policy) {
+function scoreGroupName(name) {
+  let score = 0;
+
+  for (const keyword of PREFERRED_KEYWORDS) {
+    if (name.includes(keyword)) score += 10;
+  }
+
+  for (const keyword of EXCLUDE_KEYWORDS) {
+    if (name.includes(keyword)) score -= 20;
+  }
+
+  // 太像规则分流组的，降低优先级
+  if (/Apple|Google|Telegram|Netflix|Disney|TikTok|Bilibili|Microsoft/i.test(name)) {
+    score -= 30;
+  }
+
+  return score;
+}
+
+async function getBestPolicyGroup() {
+  const groupsResult = await httpAPI("GET", "/v1/policy_groups", null);
+  const groups = normalizeGroups(groupsResult);
+
+  if (!groups.length) {
+    return {
+      group: null,
+      selected: null,
+      allGroups: []
+    };
+  }
+
+  const sorted = groups
+    .map((name, index) => ({
+      name,
+      index,
+      score: scoreGroupName(name)
+    }))
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.index - b.index;
+    });
+
+  const bestGroup = sorted[0].name;
+
+  let selected = null;
+  const selectedResult = await httpAPI(
+    "GET",
+    "/v1/policy_groups/select?group_name=" + encodeURIComponent(bestGroup),
+    null
+  );
+
+  if (selectedResult && selectedResult.policy) {
+    selected = selectedResult.policy;
+  }
+
+  return {
+    group: bestGroup,
+    selected,
+    allGroups: groups
+  };
+}
+
+function requestOneAPI(api, policy) {
   return new Promise((resolve) => {
     const start = Date.now();
 
-    $httpClient.get(
-      {
-        url: API,
-        policy,
-        timeout: 8,
-        headers: {
-          "User-Agent": "Surge Network Path Panel"
-        }
-      },
-      (error, response, data) => {
-        const ms = Date.now() - start;
+    const option = {
+      url: api.url,
+      timeout: 5,
+      headers: {
+        "User-Agent": "Surge Network Path Panel"
+      }
+    };
 
-        if (error) {
+    if (policy) {
+      option.policy = policy;
+    }
+
+    $httpClient.get(option, (error, response, data) => {
+      const ms = Date.now() - start;
+
+      if (error) {
+        resolve({
+          ok: false,
+          api: api.name,
+          policy,
+          error: String(error),
+          ms
+        });
+        return;
+      }
+
+      try {
+        const json = JSON.parse(data);
+        const parsed = api.parse(json);
+
+        if (!parsed || !parsed.ip) {
           resolve({
-            policy,
             ok: false,
-            error: String(error),
+            api: api.name,
+            policy,
+            error: "接口返回中没有 IP",
             ms
           });
           return;
         }
 
-        try {
-          const json = JSON.parse(data);
+        resolve({
+          ok: true,
+          api: api.name,
+          policy,
+          ip: parsed.ip || "未知",
+          country: parsed.country || "未知国家",
+          region: parsed.region || "",
+          city: parsed.city || "",
+          isp: parsed.isp || "未知 ISP",
+          org: parsed.org || "未知组织",
+          ms
+        });
+      } catch (e) {
+        resolve({
+          ok: false,
+          api: api.name,
+          policy,
+          error: "JSON 解析失败",
+          ms
+        });
+      }
+    });
+  });
+}
 
+function queryIP(policy) {
+  return new Promise((resolve) => {
+    let finished = false;
+    let failed = [];
+    let pending = IP_APIS.length;
+
+    for (const api of IP_APIS) {
+      requestOneAPI(api, policy).then((result) => {
+        if (finished) return;
+
+        if (result.ok) {
+          finished = true;
+          resolve(result);
+          return;
+        }
+
+        failed.push(result);
+        pending -= 1;
+
+        if (pending <= 0) {
+          finished = true;
           resolve({
-            policy,
-            ok: true,
-            ip: json.ip || "未知",
-            country: json.country || "未知国家",
-            region: json.region || "未知地区",
-            city: json.city || "未知城市",
-            isp: json.connection?.isp || "未知 ISP",
-            org: json.connection?.org || "未知组织",
-            ms
-          });
-        } catch (e) {
-          resolve({
-            policy,
             ok: false,
-            error: "IP 信息解析失败",
-            ms
+            policy,
+            error: failed.map(x => `${x.api}: ${x.error}`).join("\n"),
+            ms: Math.max.apply(null, failed.map(x => x.ms || 0))
           });
         }
-      }
-    );
+      });
+    }
   });
+}
+
+function formatLocation(info) {
+  const arr = [info.country, info.region, info.city].filter(Boolean);
+  return arr.length ? arr.join(" ") : "未知位置";
 }
 
 function formatInfo(title, info) {
   if (!info.ok) {
     return `${title}
-策略：${info.policy}
 状态：失败
-错误：${info.error}
-延迟：${info.ms}ms`;
+错误：${info.error || "未知错误"}
+延迟：${info.ms || "-"}ms`;
   }
 
   return `${title}
-策略：${info.policy}
 IP：${info.ip}
-位置：${info.country} ${info.region} ${info.city}
+位置：${formatLocation(info)}
 ISP：${info.isp}
 组织：${info.org}
+接口：${info.api}
 延迟：${info.ms}ms`;
 }
 
 async function main() {
-  const proxyPolicy = await getFirstPolicyGroup();
+  const policyInfo = await getBestPolicyGroup();
+  const proxyGroup = policyInfo.group;
+  const selectedPolicy = policyInfo.selected;
 
-  if (!proxyPolicy) {
+  if (!proxyGroup) {
+    const directOnly = await queryIP("DIRECT");
+
     $done({
-      title: "网络出口检测",
-      content: "未能读取到 Surge 策略组。\n请检查 Surge HTTP API 是否可用。",
+      title: PANEL_TITLE,
+      content: [
+        "当前路径：无法读取策略组",
+        "说明：只完成了本地直连检测。",
+        "",
+        formatInfo("本地直连出口", directOnly)
+      ].join("\n"),
       style: "error"
     });
     return;
   }
 
-  const [direct, proxy] = await Promise.all([
-    queryIP("DIRECT"),
-    queryIP(proxyPolicy)
-  ]);
+  const directPromise = queryIP("DIRECT");
+
+  // 重点：这里使用自动识别到的真实策略组名，不再写死 PROXY
+  const proxyPromise = queryIP(proxyGroup);
+
+  const results = await Promise.all([directPromise, proxyPromise]);
+  const direct = results[0];
+  const proxy = results[1];
 
   let mode = "未知";
   let style = "info";
 
   if (direct.ok && proxy.ok) {
     if (direct.ip === proxy.ip) {
-      mode = "直连 / 未经过代理";
+      mode = "直连 / 代理未生效";
       style = "alert";
     } else {
       mode = "代理 / 中转";
@@ -138,9 +386,14 @@ async function main() {
     style = "error";
   }
 
+  const selectedText = selectedPolicy
+    ? `当前子策略：${selectedPolicy}`
+    : "当前子策略：自动组 / 非手动选择组 / 未返回";
+
   const content = [
-    `当前策略组：${proxyPolicy}`,
     `当前路径：${mode}`,
+    `检测策略组：${proxyGroup}`,
+    selectedText,
     "",
     formatInfo("本地直连出口", direct),
     "",
@@ -148,7 +401,7 @@ async function main() {
   ].join("\n");
 
   $done({
-    title: "网络出口检测",
+    title: PANEL_TITLE,
     content,
     style
   });
