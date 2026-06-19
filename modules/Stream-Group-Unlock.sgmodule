@@ -2,7 +2,7 @@
 #!desc=固定检测指定策略组当前正在使用的代理节点，不切换节点。支持 Netflix、Disney+、YouTube、Prime Video。
 #!system=ios
 
-#!arguments=NETFLIX_GROUP:auto,DISNEY_GROUP:auto,YOUTUBE_GROUP:auto,PRIME_GROUP:auto,UPDATE_INTERVAL:600,NOTIFY:0,ICON:play.tv.fill,COLOR:#FF2D55
+#!arguments=NETFLIX_GROUP:auto,DISNEY_GROUP:auto,YOUTUBE_GROUP:auto,PRIME_GROUP:auto,UPDATE_INTERVAL:86400,NOTIFY:0,ICON:play.tv.fill,COLOR:#FF2D55
 #!arguments-desc=参数说明：\n\nNETFLIX_GROUP：Netflix 对应策略组名称，默认 auto 自动匹配。\nDISNEY_GROUP：Disney+ 对应策略组名称，默认 auto 自动匹配。\nYOUTUBE_GROUP：YouTube 对应策略组名称，默认 auto 自动匹配。\nPRIME_GROUP：Prime Video 对应策略组名称，默认 auto 自动匹配。\nUPDATE_INTERVAL：面板自动刷新间隔，单位秒。\nNOTIFY：结果变化时是否发通知，1 开启，0 关闭。\nICON：面板图标。\nCOLOR：面板图标颜色。
 
 [Panel]
