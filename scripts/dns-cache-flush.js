@@ -1,81 +1,83 @@
-// Surge Panel：DNS 缓存清理 V3
-// 点击此面板右侧刷新按钮，执行一次 Surge DNS 缓存清理。
+// Surge Panel：DNS 缓存清理 V4
+// 点击面板右侧刷新后，调用 Surge 内置 DNS 缓存清理接口。
 
 (function () {
-"use strict";
+  "use strict";
 
-var finished = false;
-var watchdog;
+  var finished = false;
+  var timer = null;
 
-function pad(number) {
-return number < 10 ? "0" + number : String(number);
-}
-
-function formatTime() {
-var now = new Date();
-return pad(now.getHours()) + ":" + pad(now.getMinutes());
-}
-
-function errorText(result) {
-if (!result) return "";
-
-```
-if (typeof result === "object" && result.error) {
-  if (typeof result.error === "string") {
-    return result.error;
+  function pad(value) {
+    return value < 10 ? "0" + value : String(value);
   }
 
-  return "接口返回错误";
-}
+  function nowText() {
+    var now = new Date();
+    return pad(now.getHours()) + ":" + pad(now.getMinutes());
+  }
 
-return "";
-```
+  function errorFrom(result) {
+    if (!result) {
+      return "";
+    }
 
-}
+    if (result.error) {
+      return typeof result.error === "string"
+        ? result.error
+        : "接口返回错误";
+    }
 
-function finish(result) {
-if (finished) return;
+    if (result.status && Number(result.status) >= 400) {
+      return "HTTP " + result.status;
+    }
 
-```
-finished = true;
+    return "";
+  }
 
-if (watchdog) clearTimeout(watchdog);
+  function finish(result) {
+    var error;
 
-var error = errorText(result);
+    if (finished) {
+      return;
+    }
 
-if (error) {
-  $done({
-    title: "DNS 缓存清理",
-    content: "清理失败：" + error,
-    style: "error"
-  });
+    finished = true;
 
-  return;
-}
+    if (timer) {
+      clearTimeout(timer);
+    }
 
-$done({
-  title: "DNS 缓存清理",
-  content: "已执行 · " + formatTime() + "\n缓存会随新请求自动重建",
-  style: "good"
-});
-```
+    error = errorFrom(result);
 
-}
+    if (error) {
+      $done({
+        title: "DNS 缓存清理",
+        content: "清理失败：" + error,
+        style: "error"
+      });
+      return;
+    }
 
-watchdog = setTimeout(function () {
-finish({
-error: "执行超时"
-});
-}, 6500);
+    $done({
+      title: "DNS 缓存清理",
+      content: "已清理 · " + nowText() + "\n缓存会随新请求自动重建",
+      style: "good"
+    });
+  }
 
-try {
-// 注意：$httpAPI 使用 v1/... 路径，不带开头的 /。
-$httpAPI("POST", "v1/dns/flush", {}, function (result) {
-finish(result);
-});
-} catch (error) {
-finish({
-error: "调用失败"
-});
-}
+  timer = setTimeout(function () {
+    finish({
+      error: "执行超时"
+    });
+  }, 7000);
+
+  try {
+    $httpAPI("POST", "/v1/dns/flush", {}, function (result) {
+      finish(result);
+    });
+  } catch (error) {
+    finish({
+      error: "接口调用失败"
+    });
+  }
 })();
