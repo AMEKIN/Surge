@@ -1,0 +1,10 @@
+#!name=DNS 状态与缓存维护
+#!desc=点击面板刷新可查看 DNS 延迟和缓存数量；长按“DNS缓存清理”脚本可手动清空 Surge DNS 缓存。
+#!system=ios
+
+[Panel]
+DNS状态 = title="DNS 状态",content="点击刷新检测\nDNS 缓存：--",style=info,script-name=DNS状态刷新
+
+[Script]
+DNS状态刷新 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/dns-status.js,timeout=8,engine=jsc
+DNS缓存清理 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/dns-cache-flush.js,timeout=8,engine=jsc
