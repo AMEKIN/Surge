@@ -1,14 +1,18 @@
-// Surge Panel：网络出口检测（紧凑稳定版）
-// 展示：路径 / 当前节点 / 直连与代理的地区、平均延迟、抖动、丢包
+// Surge Panel：网络出口检测（快速紧凑 IP / ISP 版）
+// 展示：路径 / 当前节点 / 直连 IP+服务商 / 代理 IP+服务商 / 代理网络质量
 
 const PANEL_TITLE = "网络出口检测";
 const TARGET_GROUP = "FINAL";
 
-// 保留 3 次采样；请在 [Script] 中设置 timeout=15。
-const SAMPLE_COUNT = 3;
-const SAMPLE_INTERVAL_MS = 80;
-const REQUEST_TIMEOUT = 4;
-const WATCHDOG_MS = 14000;
+// 仅测代理质量；两次采样可保留基础抖动参考，同时缩短刷新时间。
+const SAMPLE_COUNT = 2;
+const SAMPLE_INTERVAL_MS = 40;
+const REQUEST_TIMEOUT = 3;
+const WATCHDOG_MS = 10000;
+
+// 与 [General] 中 proxy-test-url 保持一致。
+// 该目标测得的是“当前出口到最近 Cloudflare 边缘”的 HTTP 往返时间。
+const QUALITY_TEST_URL = "http://cp.cloudflare.com/generate_204";
 
 const PREFERRED_KEYWORDS = [
   "代理", "Proxy", "PROXY", "节点", "手动", "选择", "故障", "转移",
@@ -21,11 +25,11 @@ const EXCLUDE_KEYWORDS = [
   "Domestic", "China", "中国", "直连", "下载"
 ];
 
-// 先使用 ip-api；失败时才回退，避免每次刷新产生不必要的并发请求。
+// 只保留两个可返回 ISP / 组织信息的接口，避免多级回退拖慢面板刷新。
 const IP_APIS = [
   {
     name: "ip-api",
-    url: "http://ip-api.com/json/?lang=zh-CN&fields=status,message,country,regionName,city,query",
+    url: "http://ip-api.com/json/?lang=zh-CN&fields=status,message,country,regionName,city,isp,org,query",
     type: "json",
     parse(json) {
       if (json.status && json.status !== "success") {
@@ -35,7 +39,9 @@ const IP_APIS = [
         ip: json.query,
         country: json.country || "",
         region: json.regionName || "",
-        city: json.city || ""
+        city: json.city || "",
+        isp: json.isp || "",
+        org: json.org || ""
       };
     }
   },
@@ -48,39 +54,13 @@ const IP_APIS = [
         ip: json.ip,
         country: json.country || "",
         region: json.region || "",
-        city: json.city || ""
+        city: json.city || "",
+        isp: json.isp || "",
+        org: json.organization || json.asn_organization || ""
       };
-    }
-  },
-  {
-    name: "Cloudflare Trace",
-    url: "https://www.cloudflare.com/cdn-cgi/trace",
-    type: "text",
-    parse(text) {
-      const obj = {};
-      text.split("\n").forEach((line) => {
-        const index = line.indexOf("=");
-        if (index > -1) obj[line.slice(0, index)] = line.slice(index + 1);
-      });
-      return {
-        ip: obj.ip,
-        country: obj.loc || "",
-        region: "",
-        city: obj.colo ? "CF-" + obj.colo : ""
-      };
-    }
-  },
-  {
-    name: "ipify",
-    url: "https://api.ipify.org?format=json",
-    type: "json",
-    parse(json) {
-      return { ip: json.ip, country: "", region: "", city: "" };
     }
   }
 ];
-
-const QUALITY_TEST_URL = "http://connectivitycheck.gstatic.com/generate_204";
 
 let finished = false;
 let watchdog = null;
@@ -99,12 +79,6 @@ function sleep(ms) {
 function freshURL(url) {
   const separator = url.indexOf("?") === -1 ? "?" : "&";
   return url + separator + "_surge_panel=" + Date.now() + Math.floor(Math.random() * 1000);
-}
-
-function formatClock() {
-  const now = new Date();
-  const pad = (num) => String(num).padStart(2, "0");
-  return pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
 }
 
 function httpAPI(method, path, body) {
@@ -131,15 +105,19 @@ function normalizeGroups(result) {
 
 function scoreGroupName(name) {
   let score = 0;
+
   for (const keyword of PREFERRED_KEYWORDS) {
     if (name.indexOf(keyword) !== -1) score += 10;
   }
+
   for (const keyword of EXCLUDE_KEYWORDS) {
     if (name.indexOf(keyword) !== -1) score -= 20;
   }
+
   if (/Apple|Google|Telegram|Netflix|Disney|TikTok|Bilibili|Microsoft/i.test(name)) {
     score -= 30;
   }
+
   return score;
 }
 
@@ -164,6 +142,7 @@ async function getTargetPolicyGroup() {
       .sort((a, b) => b.score !== a.score ? b.score - a.score : a.index - b.index)[0].name;
 
   const resolved = await resolveUsablePolicy(targetGroup, groups);
+
   return {
     targetGroup,
     checkPolicy: resolved.checkPolicy,
@@ -191,6 +170,7 @@ async function resolveUsablePolicy(startGroup, allGroups) {
     );
 
     const selected = getSelectedFromResult(result);
+
     if (!selected) {
       currentUsing = currentGroup;
       checkPolicy = currentGroup;
@@ -198,11 +178,13 @@ async function resolveUsablePolicy(startGroup, allGroups) {
     }
 
     currentUsing = selected;
+
     if (groupSet[selected]) {
       checkPolicy = selected;
       currentGroup = selected;
       continue;
     }
+
     break;
   }
 
@@ -225,6 +207,7 @@ function requestOneAPI(api, policy) {
 
     $httpClient.get(option, (error, response, data) => {
       const ms = Date.now() - start;
+
       if (error) {
         resolve({ ok: false, api: api.name, error: String(error), ms });
         return;
@@ -232,10 +215,12 @@ function requestOneAPI(api, policy) {
 
       try {
         const parsed = api.type === "text" ? api.parse(data) : api.parse(JSON.parse(data));
+
         if (!parsed || !parsed.ip) {
           resolve({ ok: false, api: api.name, error: "接口未返回 IP", ms });
           return;
         }
+
         resolve({ ok: true, api: api.name, ms, ...parsed });
       } catch (error) {
         resolve({ ok: false, api: api.name, error: "解析失败：" + error.message, ms });
@@ -246,6 +231,7 @@ function requestOneAPI(api, policy) {
 
 async function queryIP(policy) {
   const failed = [];
+
   for (const api of IP_APIS) {
     const result = await requestOneAPI(api, policy);
     if (result.ok) return result;
@@ -263,7 +249,7 @@ async function queryProxyIP(checkPolicy, fallbackPolicy) {
   const result = await queryIP(checkPolicy);
   if (result.ok) return result;
 
-  // 仅在子策略名称不可直接调用时，回退到顶层策略组。
+  // 仅当内层节点无法作为 policy 指定时，回退到顶层策略组。
   if (
     fallbackPolicy &&
     fallbackPolicy !== checkPolicy &&
@@ -271,6 +257,7 @@ async function queryProxyIP(checkPolicy, fallbackPolicy) {
   ) {
     return queryIP(fallbackPolicy);
   }
+
   return result;
 }
 
@@ -285,14 +272,17 @@ function qualityProbe(policy) {
         "Cache-Control": "no-cache"
       }
     };
+
     if (policy) option.policy = policy;
 
     $httpClient.get(option, (error, response) => {
       const ms = Date.now() - start;
+
       if (error) {
         resolve({ ok: false, ms, error: String(error) });
         return;
       }
+
       const status = response ? response.status : 0;
       resolve(status >= 200 && status < 400
         ? { ok: true, ms }
@@ -303,6 +293,7 @@ function qualityProbe(policy) {
 
 async function testNetworkQuality(policy) {
   const samples = [];
+
   for (let i = 0; i < SAMPLE_COUNT; i++) {
     samples.push(await qualityProbe(policy));
     if (i < SAMPLE_COUNT - 1) await sleep(SAMPLE_INTERVAL_MS);
@@ -310,6 +301,7 @@ async function testNetworkQuality(policy) {
 
   const success = samples.filter((item) => item.ok);
   const lossRate = Math.round(((samples.length - success.length) / samples.length) * 100);
+
   if (!success.length) return { ok: false, lossRate };
 
   const times = success.map((item) => item.ms);
@@ -331,16 +323,16 @@ function cleanPlace(value) {
 }
 
 function compactLocation(info) {
-  let country = cleanPlace(info.country);
-  let region = cleanPlace(info.region);
-  let city = cleanPlace(info.city);
+  let country = cleanPlace(info && info.country);
+  let region = cleanPlace(info && info.region);
+  let city = cleanPlace(info && info.city);
 
   if (country === "中国" && /台湾/.test(region + city)) country = "台湾";
   if (region === country) region = "";
   if (city === country || city === region) city = "";
 
   const parts = [country, region, city].filter(Boolean);
-  return parts.length ? parts.slice(0, 2).join("·") : (info.ip || "未知位置");
+  return parts.length ? parts.slice(0, 2).join("·") : "未知位置";
 }
 
 function compactPolicyName(name) {
@@ -348,16 +340,25 @@ function compactPolicyName(name) {
   return text.length > 23 ? text.slice(0, 22) + "…" : text;
 }
 
-function compactMetrics(quality) {
+function compactProvider(info) {
+  const text = String((info && (info.isp || info.org)) || "未知服务商")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return text.length > 18 ? text.slice(0, 17) + "…" : text;
+}
+
+function proxyMetrics(quality) {
   if (!quality || !quality.ok) return "测速失败";
   return quality.avg + "ms / 抖" + quality.jitter + " / 丢" + quality.lossRate + "%";
 }
 
-function formatExitLine(label, info, quality) {
+function formatIPLine(label, info) {
   if (!info || !info.ok) {
     return label + "：检测失败" + (info && info.ms ? " · " + info.ms + "ms" : "");
   }
-  return label + "：" + compactLocation(info) + " · " + compactMetrics(quality);
+
+  return label + "：" + info.ip + " · " + compactProvider(info);
 }
 
 async function main() {
@@ -367,27 +368,27 @@ async function main() {
   const currentUsing = policyInfo.currentUsing;
 
   if (!targetGroup || !checkPolicy) {
-    const [direct, quality] = await Promise.all([
-      queryIP("DIRECT"),
-      testNetworkQuality("DIRECT")
-    ]);
+    const direct = await queryIP("DIRECT");
     finish({
       title: PANEL_TITLE,
-      content: "路径：无法读取策略组 · " + formatClock() + "\n" + formatExitLine("直连", direct, quality),
+      content: [
+        "路径：无法读取策略组",
+        formatIPLine("直连", direct)
+      ].join("\n"),
       style: "error"
     });
     return;
   }
 
-  const [direct, proxy, directQuality, proxyQuality] = await Promise.all([
+  const [direct, proxy, proxyQuality] = await Promise.all([
     queryIP("DIRECT"),
     queryProxyIP(checkPolicy, targetGroup),
-    testNetworkQuality("DIRECT"),
     testNetworkQuality(checkPolicy)
   ]);
 
   let mode = "未知";
   let style = "info";
+
   if (direct.ok && proxy.ok) {
     if (direct.ip === proxy.ip) {
       mode = "直连 / 代理未生效";
@@ -410,10 +411,11 @@ async function main() {
   finish({
     title: PANEL_TITLE,
     content: [
-      "路径：" + mode + " · " + targetGroup + " · " + formatClock(),
+      "路径：" + mode + " · " + targetGroup,
       "节点：" + compactPolicyName(currentUsing || checkPolicy),
-      formatExitLine("直连", direct, directQuality),
-      formatExitLine("代理", proxy, proxyQuality)
+      formatIPLine("直连", direct),
+      formatIPLine("代理", proxy),
+      "质量：" + compactLocation(proxy) + " · " + proxyMetrics(proxyQuality)
     ].join("\n"),
     style
   });
