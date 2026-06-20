@@ -317,3 +317,8 @@ DOMAIN-SUFFIX,verily.com
 DOMAIN-SUFFIX,deepmind.com
 DOMAIN-SUFFIX,deepmind.google
 DOMAIN-SUFFIX,x.company
+
+# ==============================
+# Firebase Crashlytics
+# ==============================
+DOMAIN-SUFFIX,crashlytics.com
