@@ -15,3 +15,5 @@ DOMAIN,rt.applovin.com
 DOMAIN,ms.applovin.com
 DOMAIN,googleads.g.doubleclick.net
 DOMAIN,app-analytics-services.com
+DOMAIN-SUFFIX,applovin.com
+DOMAIN-SUFFIX,doubleclick.net
