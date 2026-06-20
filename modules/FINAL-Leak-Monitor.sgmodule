@@ -1,0 +1,9 @@
+#!name=FINAL 命中监控
+#!desc=读取最近请求中的 FINAL 命中，用于定位可能遗漏的分流规则。点击刷新检查；FINAL 命中不一定代表异常。
+#!system=ios
+
+[Panel]
+FINAL命中监控 = title="FINAL 命中监控",content="点击刷新检查",style=info,script-name=FINAL命中监控V1
+
+[Script]
+FINAL命中监控V1 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/final-leak-monitor.js?v=20260620v1,script-update-interval=3600,timeout=8,engine=jsc
