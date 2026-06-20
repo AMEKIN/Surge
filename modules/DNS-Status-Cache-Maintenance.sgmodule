@@ -1,11 +1,11 @@
 #!name=DNS 诊断与缓存维护
-#!desc=显示实际 DoH 查询往返时间；点击“DNS 缓存清理”可清理 Surge DNS 缓存。
+#!desc=手动测试 AliDNS 与 DNSPod 的真实 DoH 查询延迟；点击面板可清理 Surge DNS 缓存。
 #!system=ios
 
 [Panel]
-DNS状态 = title="DNS 状态",content="点击刷新检测",style=info,script-name=DNS状态V3
-DNS缓存清理 = title="DNS 缓存清理",content="点击右侧刷新执行",style=info,script-name=DNS缓存清理V3
+DNS状态 = title="DNS 状态",content="点击刷新检测",style=info,script-name=DNS状态V4
+DNS缓存清理 = title="DNS 缓存清理",content="点击右侧刷新执行",style=info,script-name=DNS缓存清理V4
 
 [Script]
-DNS状态V3 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/dns-status.js?v=20260620v3,script-update-interval=3600,timeout=12,engine=jsc
-DNS缓存清理V3 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/dns-cache-flush.js?v=20260620v3,script-update-interval=3600,timeout=8,engine=jsc
+DNS状态V4 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/dns-status.js?v=20260620v4,script-update-interval=3600,timeout=10,engine=jsc
+DNS缓存清理V4 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/dns-cache-flush.js?v=20260620v4,script-update-interval=3600,timeout=8,engine=jsc
