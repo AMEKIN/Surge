@@ -1,30 +1,29 @@
-# Tencent Supplement 2026-05-27
+# ==============================
+# Tencent Supplement
+# ==============================
+
 DOMAIN-SUFFIX,qpic.cn
 DOMAIN-SUFFIX,gtimg.cn
 DOMAIN-SUFFIX,weixin.qq.com.cn
 DOMAIN-SUFFIX,imtt.qq.com
 
-# China 2026-5-21
-DOMAIN-SUFFIX,gepush.com
+# ==============================
+# China Supplement
+# ==============================
 
-# China 2026-5-20
-DOMAIN,analytics.strava.com
-DOMAIN,blzddist1-a.akamaihd.net
+DOMAIN-SUFFIX,gepush.com
 DOMAIN,cdn.angruo.com
-DOMAIN,client.amplifi.com
-DOMAIN,download.jetbrains.com
-DOMAIN,download.microsoft.com
 DOMAIN,images-cn.ssl-images-amazon.com
-DOMAIN,ip.istatmenus.app
 DOMAIN,kc.kexinshe.com
-DOMAIN,ntservicepack.microsoft.com
-DOMAIN,origin-a.akamaihd.ne
-DOMAIN,origin-a.akamaihd.net
 DOMAIN,sms.imagetasks.com
-DOMAIN,steamcommunity-a.akamaihd.net
 DOMAIN,weixin.com
 DOMAIN,www.libvideo.com
 DOMAIN,www.yxssp.com
+
+# ==============================
+# China Domains
+# ==============================
+
 DOMAIN-SUFFIX,00cdn.com
 DOMAIN-SUFFIX,0123456789.com
 DOMAIN-SUFFIX,0379home.com
@@ -302,7 +301,6 @@ DOMAIN-SUFFIX,9ht.com
 DOMAIN-SUFFIX,9xgame.com
 DOMAIN-SUFFIX,9xu.com
 DOMAIN-SUFFIX,a9vg.com
-DOMAIN-SUFFIX,aaplimg.com
 DOMAIN-SUFFIX,aardio.com
 DOMAIN-SUFFIX,abc-ca.com
 DOMAIN-SUFFIX,abchina.com
@@ -357,7 +355,6 @@ DOMAIN-SUFFIX,aixifan.com
 DOMAIN-SUFFIX,aiyunxiao.com
 DOMAIN-SUFFIX,aizhan.com
 DOMAIN-SUFFIX,ajzq.com
-DOMAIN-SUFFIX,akadns.net
 DOMAIN-SUFFIX,aldwx.com
 DOMAIN-SUFFIX,ali213.net
 DOMAIN-SUFFIX,aliapp.org
@@ -536,7 +533,6 @@ DOMAIN-SUFFIX,bdxiguastatic.com
 DOMAIN-SUFFIX,bdydns.com
 DOMAIN-SUFFIX,bdydns.net
 DOMAIN-SUFFIX,bearychat.com
-DOMAIN-SUFFIX,beatsbydre.com
 DOMAIN-SUFFIX,beihaidc.com
 DOMAIN-SUFFIX,beijing-lipin.com
 DOMAIN-SUFFIX,beitaichufang.com
@@ -751,12 +747,6 @@ DOMAIN-SUFFIX,cecdc.com
 DOMAIN-SUFFIX,cecport.com
 DOMAIN-SUFFIX,centanet.com
 DOMAIN-SUFFIX,cerambath.org
-DOMAIN-SUFFIX,cf-ns.com
-DOMAIN-SUFFIX,cf-ns.net
-DOMAIN-SUFFIX,cf-ns.site
-DOMAIN-SUFFIX,cf-ns.tech
-DOMAIN-SUFFIX,cftest7.com
-DOMAIN-SUFFIX,cftest8.com
 DOMAIN-SUFFIX,cfund108.com
 DOMAIN-SUFFIX,cfzq.com
 DOMAIN-SUFFIX,cgws.com
@@ -887,12 +877,6 @@ DOMAIN-SUFFIX,clouddalian.com
 DOMAIN-SUFFIX,clouddatong.com
 DOMAIN-SUFFIX,clouddn.com
 DOMAIN-SUFFIX,clouddongying.com
-DOMAIN-SUFFIX,cloudflare-cn.com
-DOMAIN-SUFFIX,cloudflarecn.net
-DOMAIN-SUFFIX,cloudflareinsights-cn.com
-DOMAIN-SUFFIX,cloudflareprod.com
-DOMAIN-SUFFIX,cloudflarestaging.com
-DOMAIN-SUFFIX,cloudflarestoragegw.com
 DOMAIN-SUFFIX,cloudfoshan.com
 DOMAIN-SUFFIX,cloudfront-cn.net
 DOMAIN-SUFFIX,cloudfuqing.com
@@ -925,7 +909,6 @@ DOMAIN-SUFFIX,cloudsanya.com
 DOMAIN-SUFFIX,cloudshanghai.com
 DOMAIN-SUFFIX,cloudshaoyang.com
 DOMAIN-SUFFIX,cloudshenfuxingqu.com
-DOMAIN-SUFFIX,cloudsigma.com
 DOMAIN-SUFFIX,cloudsiping.com
 DOMAIN-SUFFIX,cloudsite.vip
 DOMAIN-SUFFIX,cloudsuqian.com
@@ -1158,7 +1141,6 @@ DOMAIN-SUFFIX,discuz.org
 DOMAIN-SUFFIX,diyiyou.com
 DOMAIN-SUFFIX,dj99.com
 DOMAIN-SUFFIX,dl-vip.pcfaster.baidu.co.th
-DOMAIN-SUFFIX,dl.delivery.mp.microsoft.com
 DOMAIN-SUFFIX,dler.cloud
 DOMAIN-SUFFIX,dlgslb.net
 DOMAIN-SUFFIX,dlnel.com
@@ -1416,7 +1398,6 @@ DOMAIN-SUFFIX,gameitop.com
 DOMAIN-SUFFIX,gameloop.com
 DOMAIN-SUFFIX,gamemei.com
 DOMAIN-SUFFIX,gamersky.com
-DOMAIN-SUFFIX,gandi.net
 DOMAIN-SUFFIX,ganji.com
 DOMAIN-SUFFIX,ganjistatic1.com
 DOMAIN-SUFFIX,gaode.com
@@ -1607,7 +1588,6 @@ DOMAIN-SUFFIX,hongxiu.com
 DOMAIN-SUFFIX,hongyuanqh.com
 DOMAIN-SUFFIX,hori-gz.com
 DOMAIN-SUFFIX,hostbuf.com
-DOMAIN-SUFFIX,hotmail.com
 DOMAIN-SUFFIX,houdao.com
 DOMAIN-SUFFIX,houyicaiji.com
 DOMAIN-SUFFIX,houyuantuan.com
@@ -2316,7 +2296,6 @@ DOMAIN-SUFFIX,miaomiaozhe.com
 DOMAIN-SUFFIX,miaopai.com
 DOMAIN-SUFFIX,miaostreet.com
 DOMAIN-SUFFIX,miaozhen.com
-DOMAIN-SUFFIX,microsoftonline.com
 DOMAIN-SUFFIX,midasbuy.com
 DOMAIN-SUFFIX,miercn.com
 DOMAIN-SUFFIX,migucloud.com
@@ -2373,7 +2352,6 @@ DOMAIN-SUFFIX,moulem.com
 DOMAIN-SUFFIX,mpg.de
 DOMAIN-SUFFIX,ms
 DOMAIN-SUFFIX,msanjia.com
-DOMAIN-SUFFIX,msauth.net
 DOMAIN-SUFFIX,mscbsc.com
 DOMAIN-SUFFIX,msecnd.net
 DOMAIN-SUFFIX,mshare.cc
@@ -2416,7 +2394,6 @@ DOMAIN-SUFFIX,myypark.com
 DOMAIN-SUFFIX,myyx618.com
 DOMAIN-SUFFIX,myzaker.com
 DOMAIN-SUFFIX,mzres.com
-DOMAIN-SUFFIX,mzstatic.com
 DOMAIN-SUFFIX,na-mexico-1.myhuaweicloud.com
 DOMAIN-SUFFIX,nagcloudcs.com
 DOMAIN-SUFFIX,naixuecha.com
@@ -2468,10 +2445,6 @@ DOMAIN-SUFFIX,ocwms.com
 DOMAIN-SUFFIX,oecd-ilibrary.org
 DOMAIN-SUFFIX,oeeee.com
 DOMAIN-SUFFIX,offcn.com
-DOMAIN-SUFFIX,office.com
-DOMAIN-SUFFIX,office.net
-DOMAIN-SUFFIX,office365.com
-DOMAIN-SUFFIX,officese.com
 DOMAIN-SUFFIX,oi-wiki.com
 DOMAIN-SUFFIX,oicq88.com
 DOMAIN-SUFFIX,okooo.com
@@ -2516,7 +2489,6 @@ DOMAIN-SUFFIX,oupeng.com
 DOMAIN-SUFFIX,ourbits.club
 DOMAIN-SUFFIX,ourdvs.com
 DOMAIN-SUFFIX,ourdvsss.com
-DOMAIN-SUFFIX,outlook.com
 DOMAIN-SUFFIX,ovid.com
 DOMAIN-SUFFIX,ovscdns.com
 DOMAIN-SUFFIX,ovscdns.net
@@ -2739,7 +2711,6 @@ DOMAIN-SUFFIX,ruguoapp.com
 DOMAIN-SUFFIX,runoob.com
 DOMAIN-SUFFIX,runsheng.com
 DOMAIN-SUFFIX,rzrc114.com
-DOMAIN-SUFFIX,s-microsoft.com
 DOMAIN-SUFFIX,s-reader.com
 DOMAIN-SUFFIX,sa-brazil-1.myhuaweicloud.com
 DOMAIN-SUFFIX,saasops.tech
@@ -3212,7 +3183,6 @@ DOMAIN-SUFFIX,uonline-sh.net
 DOMAIN-SUFFIX,upai.com
 DOMAIN-SUFFIX,upaiyun.com
 DOMAIN-SUFFIX,upcdn.net
-DOMAIN-SUFFIX,update.microsoft.com
 DOMAIN-SUFFIX,upe.net
 DOMAIN-SUFFIX,upyun.com
 DOMAIN-SUFFIX,urselect.com
@@ -3329,12 +3299,8 @@ DOMAIN-SUFFIX,win007.com
 DOMAIN-SUFFIX,win7china.com
 DOMAIN-SUFFIX,win8.net
 DOMAIN-SUFFIX,win8china.com
-DOMAIN-SUFFIX,windows.com
-DOMAIN-SUFFIX,windows.net
 DOMAIN-SUFFIX,windows10zj.com
 DOMAIN-SUFFIX,windows7en.com
-DOMAIN-SUFFIX,windowsupdate.com
-DOMAIN-SUFFIX,windowsupdate.microsoft.com
 DOMAIN-SUFFIX,windowszj.com
 DOMAIN-SUFFIX,winegame.net
 DOMAIN-SUFFIX,winwin7.com
@@ -3382,8 +3348,6 @@ DOMAIN-SUFFIX,x315.com
 DOMAIN-SUFFIX,xa-bank.com
 DOMAIN-SUFFIX,xafc.com
 DOMAIN-SUFFIX,xbiao.com
-DOMAIN-SUFFIX,xbox.com
-DOMAIN-SUFFIX,xboxlive.com
 DOMAIN-SUFFIX,xcsc.com
 DOMAIN-SUFFIX,xdrig.com
 DOMAIN-SUFFIX,xdwan.com
@@ -3701,64 +3665,13 @@ DOMAIN-SUFFIX,zuoyebang.com
 DOMAIN-SUFFIX,zybang.com
 DOMAIN-SUFFIX,zyh365.com
 DOMAIN-SUFFIX,zzdtec.com
-DOMAIN-KEYWORD,.tmall.com
+
+# ==============================
+# China Keyword
+# ==============================
+
 DOMAIN-KEYWORD,alicdn
 DOMAIN-KEYWORD,alipay
 DOMAIN-KEYWORD,aliyun
 DOMAIN-KEYWORD,baidu
-DOMAIN-KEYWORD,beplay
-DOMAIN-KEYWORD,microsoft
-DOMAIN-KEYWORD,officecdn
 DOMAIN-KEYWORD,taobao
-IP-CIDR,1.255.62.0/24,no-resolve
-IP-CIDR,101.32.104.0/21,no-resolve
-IP-CIDR,101.32.118.0/23,no-resolve
-IP-CIDR,101.32.96.0/20,no-resolve
-IP-CIDR,119.28.28.28/32,no-resolve
-IP-CIDR,120.195.181.180/32,no-resolve
-IP-CIDR,129.226.0.0/16,no-resolve
-IP-CIDR,182.254.116.0/24,no-resolve
-IP-CIDR,183.128.0.0/11,no-resolve
-IP-CIDR,183.131.48.0/20,no-resolve
-IP-CIDR,185.188.32.0/22,no-resolve
-IP-CIDR,185.188.32.0/24,no-resolve
-IP-CIDR,185.188.33.0/24,no-resolve
-IP-CIDR,185.188.34.0/24,no-resolve
-IP-CIDR,185.188.35.0/24,no-resolve
-IP-CIDR,203.205.238.0/23,no-resolve
-IP-CIDR,203.205.254.0/23,no-resolve
-IP-CIDR6,2a0b:b580::/48,no-resolve
-IP-CIDR6,2a0b:b581::/48,no-resolve
-IP-CIDR6,2a0b:b582::/48,no-resolve
-IP-CIDR6,2a0b:b583::/48,no-resolve
-USER-AGENT,%E4%B8%AD%E5%9B%BD%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C*
-USER-AGENT,%E4%BA%AC%E4%B8%9C%E5%88%B0%E5%AE%B6*
-USER-AGENT,%E4%BC%81%E4%B8%9A%E5%BE%AE%E4%BF%A1*
-USER-AGENT,%E4%BC%98%E9%85%B7*
-USER-AGENT,%E5%8D%B3%E5%88%BB*
-USER-AGENT,%E7%BD%91%E6%98%93%E4%BA%91%E9%9F%B3%E4%B9%90*
-USER-AGENT,*Vainglory*
-USER-AGENT,AdBlock*
-USER-AGENT,Best%20Trace*
-USER-AGENT,MegaWerewolf*
-USER-AGENT,MicroMessenger%20Client
-USER-AGENT,MicroMessenger*
-USER-AGENT,MicroMessengerClient*
-USER-AGENT,Microsoft*
-USER-AGENT,Moke*
-USER-AGENT,NeteaseMusic*
-USER-AGENT,QQ*
-USER-AGENT,RemotePlay*
-USER-AGENT,TIM*
-USER-AGENT,TeamViewer*
-USER-AGENT,WeChat*
-USER-AGENT,WebTorrent*
-USER-AGENT,YYeTs*
-USER-AGENT,arrowio*
-USER-AGENT,balls*
-USER-AGENT,cmb*
-USER-AGENT,cmblife*
-USER-AGENT,eusoft_ting_en_iphone
-USER-AGENT,hearthstone*
-USER-AGENT,hide*
-USER-AGENT,ting_en
