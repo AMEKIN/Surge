@@ -1,6 +1,7 @@
 # ==============================
 # Google
 # ==============================
+DOMAIN,dns.google
 DOMAIN-SUFFIX,google.com
 DOMAIN-SUFFIX,google.net
 DOMAIN-SUFFIX,google.org
