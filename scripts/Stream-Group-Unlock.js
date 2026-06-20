@@ -1,9 +1,9 @@
-// Surge Panel：指定策略组流媒体解锁检测
+// Surge Panel：流媒体解锁检测
 // 功能：
-// 1. 自动识别或手动指定 Netflix / Disney+ / YouTube / Prime Video 策略组
-// 2. 检测该策略组当前出口的流媒体解锁状态
-// 3. 不切换节点，不修改策略组，只读取当前选择并固定用 policy 发起检测
-// 4. 支持 Panel 展示，支持结果变化通知
+// 1. 自动识别或手动指定 Netflix / Disney+ / YouTube 策略组
+// 2. 检测策略组当前出口的流媒体解锁状态
+// 3. 不切换节点、不修改策略组，只读取当前选择并固定用 policy 发起检测
+// 4. 紧凑面板展示；检测并行执行；仅在状态变化时通知
 
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
@@ -14,9 +14,10 @@ const REQUEST_HEADERS = {
   "Accept-Language": "en-US,en;q=0.9",
 };
 
+const PANEL_TITLE = "流媒体解锁";
 const DEFAULT_ICON = "play.tv.fill";
 const DEFAULT_COLOR = "#FF2D55";
-const TIMEOUT = 8;
+const TIMEOUT = 7;
 
 const args = parseArgs($argument || "");
 
@@ -48,13 +49,6 @@ const SERVICES = [
     keywords: ["youtube", "yt", "油管"],
     checker: checkYouTube,
   },
-  {
-    id: "prime",
-    name: "Prime Video",
-    groupArg: "prime_group",
-    keywords: ["prime", "prime video", "amazon", "亚马逊"],
-    checker: checkPrimeVideo,
-  },
 ];
 
 (async () => {
@@ -66,90 +60,104 @@ const SERVICES = [
 
     if (!groups || Object.keys(groups).length === 0) {
       return donePanel({
-        title: "流媒体解锁检测",
-        content: "⚠️ 未能读取到 [Proxy Group]\n请确认 Surge HTTP API / 脚本权限正常",
+        title: PANEL_TITLE,
+        content: "⚠️ 未能读取 [Proxy Group]",
         color: "#FF9500",
       });
     }
 
-    const lines = [];
-    const results = [];
+    // 三项检测并行执行：总耗时接近最慢的一项，而非三项耗时相加。
+    const checks = await Promise.all(
+      SERVICES.map((service) => inspectService(service, groups))
+    );
 
-    for (const service of SERVICES) {
-      const groupName = findServiceGroup(service, groups);
-
-      if (!groupName) {
-        const exact = cleanArg(args[service.groupArg]);
-        if (exact && exact.toLowerCase() !== "auto") {
-          lines.push(`${service.name}: ⚠️ 未找到策略组「${exact}」`);
-        } else {
-          lines.push(`${service.name}: ⚠️ 未匹配到策略组`);
-        }
-        continue;
-      }
-
-      const chain = await resolvePolicyChain(groupName, groups);
-      const nodeName = chain.length > 1 ? chain[chain.length - 1] : groupName;
-
-      let result;
-      try {
-        result = await service.checker(groupName);
-      } catch (e) {
-        result = {
-          ok: false,
-          text: "检测失败",
-          detail: stringifyError(e),
-          color: "warn",
-        };
-      }
-
-      const chainText = chain.length > 1 ? chain.join(" → ") : groupName;
-      const line = `${service.name}: ${result.text}\n  组: ${groupName}\n  当前: ${nodeName}`;
-
-      lines.push(line);
-      results.push({
-        service: service.name,
-        group: groupName,
-        node: nodeName,
-        result: result.text,
-        chain: chainText,
-      });
-    }
-
+    const lines = checks.map(formatServiceLine);
+    const summary = lines.join("\n");
     const cost = ((Date.now() - startedAt) / 1000).toFixed(1);
-    const content = `${lines.join("\n\n")}\n\n⏱ ${cost}s  ·  ${formatTime(new Date())}`;
+    const content = `${summary}\n⏱ ${cost}s · ${formatShortTime(new Date())}`;
 
     if (CONFIG.notify) {
-      notifyIfChanged(content);
+      // 通知签名不包含时间，避免每次刷新都被误判为状态变化。
+      const signature = checks
+        .map((item) => [item.service.id, item.groupName, item.nodeName, item.resultText].join("|"))
+        .join("\n");
+      notifyIfChanged(signature, summary);
     }
 
     donePanel({
-      title: "流媒体解锁检测",
+      title: PANEL_TITLE,
       content,
       color: hasAnyFailure(content) ? "#FF9500" : "#30D158",
     });
   } catch (e) {
     donePanel({
-      title: "流媒体解锁检测",
+      title: PANEL_TITLE,
       content: `❌ 脚本异常\n${stringifyError(e)}`,
       color: "#FF3B30",
     });
   }
 })();
 
+async function inspectService(service, groups) {
+  const groupName = findServiceGroup(service, groups);
+
+  if (!groupName) {
+    const exact = cleanArg(args[service.groupArg]);
+    return {
+      service,
+      groupName: "",
+      nodeName: "",
+      resultText: exact ? `⚠️ 未找到「${exact}」` : "⚠️ 未匹配策略组",
+      failed: true,
+    };
+  }
+
+  let nodeName = groupName;
+  try {
+    const chain = await resolvePolicyChain(groupName, groups);
+    nodeName = chain.length > 1 ? chain[chain.length - 1] : groupName;
+  } catch (_) {}
+
+  try {
+    const result = await service.checker(groupName);
+    return {
+      service,
+      groupName,
+      nodeName,
+      resultText: result.text || "⚠️ 检测失败",
+      failed: !result.ok,
+    };
+  } catch (e) {
+    return {
+      service,
+      groupName,
+      nodeName,
+      resultText: "⚠️ 检测失败",
+      failed: true,
+    };
+  }
+}
+
+function formatServiceLine(item) {
+  if (!item.groupName) return `${item.service.name}：${item.resultText}`;
+  return `${item.service.name}：${item.resultText} · ${item.nodeName || item.groupName}`;
+}
+
 function parseArgs(argument) {
   const obj = {};
+
   argument.split("&").forEach((part) => {
     if (!part) return;
+
     const idx = part.indexOf("=");
-    if (idx === -1) {
-      obj[safeDecode(part)] = "";
-      return;
-    }
-    const key = safeDecode(part.slice(0, idx)).trim();
-    const val = safeDecode(part.slice(idx + 1)).trim();
-    obj[key] = val;
+    const rawKey = idx === -1 ? part : part.slice(0, idx);
+    const rawValue = idx === -1 ? "" : part.slice(idx + 1);
+    const key = safeDecode(rawKey).trim().toLowerCase();
+    const value = safeDecode(rawValue).trim();
+
+    if (key) obj[key] = value;
   });
+
   return obj;
 }
 
@@ -169,7 +177,7 @@ function cleanArg(v) {
 
 function donePanel({ title, content, color }) {
   $done({
-    title: title || "流媒体解锁检测",
+    title: title || PANEL_TITLE,
     content: content || "",
     icon: CONFIG.icon,
     "icon-color": color || CONFIG.color,
@@ -195,15 +203,7 @@ async function getCurrentProfileText() {
 
   if (typeof result === "string") return result;
 
-  const possibleKeys = [
-    "profile",
-    "content",
-    "text",
-    "config",
-    "body",
-    "data",
-  ];
-
+  const possibleKeys = ["profile", "content", "text", "config", "body", "data"];
   for (const key of possibleKeys) {
     if (typeof result[key] === "string") return result[key];
   }
@@ -214,11 +214,10 @@ async function getCurrentProfileText() {
 function parseProxyGroups(profileText) {
   const groups = {};
   const lines = String(profileText || "").split(/\r?\n/);
-
   let inProxyGroup = false;
 
   for (let rawLine of lines) {
-    let line = rawLine.trim();
+    const line = rawLine.trim();
 
     if (!line || line.startsWith("#") || line.startsWith(";")) continue;
 
@@ -234,12 +233,10 @@ function parseProxyGroups(profileText) {
 
     const name = line.slice(0, eq).trim();
     const body = line.slice(eq + 1).trim();
-
     if (!name || !body) continue;
 
     const tokens = splitConfigLine(body);
     const type = (tokens[0] || "").trim().toLowerCase();
-
     const options = tokens
       .slice(1)
       .map((x) => x.trim())
@@ -247,12 +244,7 @@ function parseProxyGroups(profileText) {
       .filter((x) => !x.includes("="))
       .filter((x) => !isReservedPolicyToken(x));
 
-    groups[name] = {
-      name,
-      type,
-      options,
-      raw: body,
-    };
+    groups[name] = { name, type, options, raw: body };
   }
 
   return groups;
@@ -287,14 +279,7 @@ function splitConfigLine(input) {
 
 function isReservedPolicyToken(token) {
   const t = token.trim().toUpperCase();
-
-  return [
-    "DIRECT",
-    "REJECT",
-    "REJECT-TINYGIF",
-    "REJECT-DROP",
-    "REJECT-NO-DROP",
-  ].includes(t);
+  return ["DIRECT", "REJECT", "REJECT-TINYGIF", "REJECT-DROP", "REJECT-NO-DROP"].includes(t);
 }
 
 function findServiceGroup(service, groups) {
@@ -305,9 +290,7 @@ function findServiceGroup(service, groups) {
     const exactHit = groupNames.find((name) => name === exact);
     if (exactHit) return exactHit;
 
-    const normalizedHit = groupNames.find(
-      (name) => normalize(name) === normalize(exact)
-    );
+    const normalizedHit = groupNames.find((name) => normalize(name) === normalize(exact));
     if (normalizedHit) return normalizedHit;
 
     return null;
@@ -348,7 +331,6 @@ function scoreGroupName(name, keywords) {
   }
 
   if (/流媒体|媒体|stream|media/i.test(name)) score += 5;
-
   return score;
 }
 
@@ -360,8 +342,7 @@ async function resolvePolicyChain(groupName, groups) {
     if (!groups[current]) break;
 
     const selected = await getSelectedPolicy(current).catch(() => "");
-    if (!selected) break;
-    if (chain.includes(selected)) break;
+    if (!selected || chain.includes(selected)) break;
 
     chain.push(selected);
     current = selected;
@@ -373,18 +354,11 @@ async function resolvePolicyChain(groupName, groups) {
 }
 
 async function getSelectedPolicy(groupName) {
-  const path =
-    "/v1/policy_groups/select?group_name=" + encodeURIComponent(groupName);
+  const path = "/v1/policy_groups/select?group_name=" + encodeURIComponent(groupName);
   const result = await httpAPI("GET", path, {});
 
-  if (result && typeof result.policy === "string") {
-    return result.policy;
-  }
-
-  if (result && typeof result.selected === "string") {
-    return result.selected;
-  }
-
+  if (result && typeof result.policy === "string") return result.policy;
+  if (result && typeof result.selected === "string") return result.selected;
   return "";
 }
 
@@ -398,21 +372,11 @@ function request(method, url, policy, opt = {}) {
       "auto-redirect": opt.autoRedirect !== false,
     };
 
-    if (opt.body !== undefined) {
-      options.body = opt.body;
-    }
+    if (opt.body !== undefined) options.body = opt.body;
 
-    const fn = method.toLowerCase();
-
-    $httpClient[fn](options, (error, response, data) => {
+    $httpClient[method.toLowerCase()](options, (error, response, data) => {
       if (error) {
-        resolve({
-          ok: false,
-          error,
-          status: 0,
-          headers: {},
-          data: "",
-        });
+        resolve({ ok: false, error, status: 0, headers: {}, data: "" });
         return;
       }
 
@@ -437,69 +401,45 @@ function getHeader(headers, name) {
 function withTimeout(promise, ms) {
   return Promise.race([
     promise,
-    new Promise((_, reject) => {
-      setTimeout(() => reject("Timeout"), ms);
-    }),
+    new Promise((_, reject) => setTimeout(() => reject("Timeout"), ms)),
   ]);
 }
 
-// Netflix 检测：
-// 81280792 用于检测非自制片库，80018499 用于自制内容兜底。
-// 地区识别优化：优先读取跳转 Location，其次读取页面字段，最后用出口 IP 地区兜底。
+// Netflix：81280792 用于完整片库检测；80018499 用于仅自制内容兜底。
 async function checkNetflix(policy) {
   const full = await netflixInner(policy, "81280792");
 
   if (full.status === "ok") {
     const region = await getNetflixDisplayRegion(policy, full.region);
-    return {
-      ok: true,
-      text: `✅ 完整解锁 ${region}`,
-    };
+    return { ok: true, text: `✅ 完整 ${region}` };
   }
 
-  if (full.status === "blocked") {
-    return {
-      ok: false,
-      text: "❌ 不支持",
-    };
-  }
+  if (full.status === "blocked") return { ok: false, text: "❌ 不支持" };
 
   if (full.status === "not_found") {
     const original = await netflixInner(policy, "80018499");
 
     if (original.status === "ok") {
       const region = await getNetflixDisplayRegion(policy, original.region);
-      return {
-        ok: true,
-        text: `⚠️ 仅自制剧 ${region}`,
-      };
+      return { ok: true, text: `⚠️ 自制 ${region}` };
     }
 
     if (original.status === "not_found" || original.status === "blocked") {
-      return {
-        ok: false,
-        text: "❌ 不支持",
-      };
+      return { ok: false, text: "❌ 不支持" };
     }
   }
 
-  return {
-    ok: false,
-    text: "⚠️ 检测失败",
-  };
+  return { ok: false, text: "⚠️ 检测失败" };
 }
 
 async function netflixInner(policy, filmId) {
   const url = `https://www.netflix.com/title/${filmId}`;
-
-  // 先关闭自动跳转，用来抓 Location 里的地区路径，例如 /hk/title/xxxx
   const first = await request("GET", url, policy, {
     autoRedirect: false,
     headers: REQUEST_HEADERS,
   });
 
   if (!first.ok) return { status: "error" };
-
   if (first.status === 403) return { status: "blocked" };
   if (first.status === 404) return { status: "not_found" };
 
@@ -507,28 +447,19 @@ async function netflixInner(policy, filmId) {
     getHeader(first.headers, "location") ||
     getHeader(first.headers, "x-originating-url") ||
     "";
-
   const regionFromLocation = extractNetflixRegion(location);
 
   if (first.status >= 300 && first.status < 400) {
-    if (regionFromLocation) {
-      return {
-        status: "ok",
-        region: regionFromLocation,
-      };
-    }
+    if (regionFromLocation) return { status: "ok", region: regionFromLocation };
 
-    // 如果有跳转地址但没识别到地区，再跟随一次
     if (location) {
       const followUrl = location.startsWith("http")
         ? location
         : `https://www.netflix.com${location}`;
-
       const second = await request("GET", followUrl, policy, {
         autoRedirect: true,
         headers: REQUEST_HEADERS,
       });
-
       return parseNetflixResponse(second, location);
     }
 
@@ -540,7 +471,6 @@ async function netflixInner(policy, filmId) {
 
 function parseNetflixResponse(res, extraText) {
   if (!res.ok) return { status: "error" };
-
   if (res.status === 403) return { status: "blocked" };
   if (res.status === 404) return { status: "not_found" };
 
@@ -552,17 +482,12 @@ function parseNetflixResponse(res, extraText) {
       extraText || "",
     ].join("\n");
 
-    const bodyText = String(res.data || "");
-
     const region =
       extractNetflixRegion(headerText) ||
-      extractNetflixRegion(bodyText) ||
+      extractNetflixRegion(String(res.data || "")) ||
       "";
 
-    return {
-      status: "ok",
-      region,
-    };
+    return { status: "ok", region };
   }
 
   return { status: "error" };
@@ -570,18 +495,12 @@ function parseNetflixResponse(res, extraText) {
 
 async function getNetflixDisplayRegion(policy, region) {
   if (region) return region;
-
   const geo = await getGeoFallback(policy);
-
-  // 星号代表这是出口 IP 地区兜底，不是 Netflix 页面明确返回的地区
-  if (geo) return `${geo}*`;
-
-  return "未知";
+  return geo ? `${geo}*` : "未知";
 }
 
 function extractNetflixRegion(text) {
   const s = String(text || "");
-
   const patterns = [
     /netflix\.com\/([a-z]{2})\/title/i,
     /netflix\.com\/[a-z]{2}-([a-z]{2})\/title/i,
@@ -597,16 +516,11 @@ function extractNetflixRegion(text) {
 
   for (const p of patterns) {
     const m = s.match(p);
-    if (m && m[1]) {
-      const region = m[1].toUpperCase();
+    if (!m || !m[1]) continue;
 
-      // 避免把 /en/title 这种语言路径误判成 EN 地区
-      if (["EN", "ZH", "JA", "KO", "FR", "DE", "ES", "IT", "PT"].includes(region)) {
-        continue;
-      }
-
-      return region;
-    }
+    const region = m[1].toUpperCase();
+    if (["EN", "ZH", "JA", "KO", "FR", "DE", "ES", "IT", "PT"].includes(region)) continue;
+    return region;
   }
 
   return "";
@@ -628,14 +542,8 @@ async function getGeoFallback(policy) {
 
     try {
       const json = JSON.parse(res.data || "{}");
-
-      if (json.countryCode) {
-        return String(json.countryCode).toUpperCase();
-      }
-
-      if (json.country_code) {
-        return String(json.country_code).toUpperCase();
-      }
+      if (json.countryCode) return String(json.countryCode).toUpperCase();
+      if (json.country_code) return String(json.country_code).toUpperCase();
     } catch (_) {}
   }
 
@@ -644,38 +552,21 @@ async function getGeoFallback(policy) {
 
 // YouTube Premium 检测
 async function checkYouTube(policy) {
-  const res = await request(
-    "GET",
-    "https://www.youtube.com/premium",
-    policy
-  );
+  const res = await request("GET", "https://www.youtube.com/premium", policy);
 
-  if (!res.ok || res.status !== 200) {
-    return {
-      ok: false,
-      text: "⚠️ 检测失败",
-    };
-  }
+  if (!res.ok || res.status !== 200) return { ok: false, text: "⚠️ 检测失败" };
 
   const data = String(res.data || "");
-
   if (data.includes("Premium is not available in your country")) {
-    return {
-      ok: false,
-      text: "❌ Premium 不支持",
-    };
+    return { ok: false, text: "❌ Premium 不支持" };
   }
 
   let region = "未知";
-
   const match = data.match(/"countryCode"\s*:\s*"([A-Z]{2})"/i);
   if (match && match[1]) region = match[1].toUpperCase();
   else if (data.includes("www.google.cn")) region = "CN";
 
-  return {
-    ok: true,
-    text: `✅ Premium ${region}`,
-  };
+  return { ok: true, text: `✅ Premium ${region}` };
 }
 
 // Disney+ 检测
@@ -683,63 +574,30 @@ async function checkDisneyPlus(policy) {
   try {
     await withTimeout(disneyHome(policy), TIMEOUT * 1000);
     const info = await withTimeout(disneyLocation(policy), TIMEOUT * 1000);
-
     const region = (info.countryCode || "未知").toUpperCase();
 
-    if (
-      info.inSupportedLocation === false ||
-      info.inSupportedLocation === "false"
-    ) {
-      return {
-        ok: false,
-        text: `⚠️ 即将登陆/受限 ${region}`,
-      };
+    if (info.inSupportedLocation === false || info.inSupportedLocation === "false") {
+      return { ok: false, text: `⚠️ 受限 ${region}` };
     }
 
-    return {
-      ok: true,
-      text: `✅ 已解锁 ${region}`,
-    };
+    return { ok: true, text: `✅ ${region}` };
   } catch (e) {
-    if (String(e) === "Not Available") {
-      return {
-        ok: false,
-        text: "❌ 不支持",
-      };
-    }
-
-    if (String(e) === "Timeout") {
-      return {
-        ok: false,
-        text: "⚠️ 检测超时",
-      };
-    }
-
-    return {
-      ok: false,
-      text: "⚠️ 检测失败",
-    };
+    if (String(e) === "Not Available") return { ok: false, text: "❌ 不支持" };
+    if (String(e) === "Timeout") return { ok: false, text: "⚠️ 超时" };
+    return { ok: false, text: "⚠️ 检测失败" };
   }
 }
 
 async function disneyHome(policy) {
-  const res = await request(
-    "GET",
-    "https://www.disneyplus.com/",
-    policy,
-    {
-      headers: {
-        "User-Agent": UA,
-        "Accept-Language": "en-US,en;q=0.9",
-      },
-    }
-  );
+  const res = await request("GET", "https://www.disneyplus.com/", policy, {
+    headers: {
+      "User-Agent": UA,
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+  });
 
   if (!res.ok || res.status !== 200) throw "Not Available";
-
-  const data = String(res.data || "");
-
-  if (data.includes("Sorry, Disney+ is not available in your region.")) {
+  if (String(res.data || "").includes("Sorry, Disney+ is not available in your region.")) {
     throw "Not Available";
   }
 
@@ -777,7 +635,7 @@ async function disneyLocation(policy) {
       headers: {
         "User-Agent": UA,
         "Accept-Language": "en-US,en;q=0.9",
-        "Authorization":
+        Authorization:
           "ZGlzbmV5JmJyb3dzZXImMS4wLjA.Cu56AgSfBTDag5NiRA81oLHkDZfu5L3CKadnefEAY84",
         "Content-Type": "application/json",
       },
@@ -806,86 +664,15 @@ async function disneyLocation(policy) {
   };
 }
 
-// Prime Video 轻量检测
-// 说明：Prime Video 受账号、订阅、地区、影片版权等因素影响更明显。
-// 这里主要检测 Prime Video 站点区域访问与页面地区，不等价于所有片库完整播放。
-async function checkPrimeVideo(policy) {
-  const res = await request(
-    "GET",
-    "https://www.primevideo.com/",
-    policy,
-    {
-      headers: {
-        "User-Agent": UA,
-        "Accept-Language": "en-US,en;q=0.9",
-      },
-    }
-  );
-
-  if (!res.ok) {
-    return {
-      ok: false,
-      text: "⚠️ 检测失败",
-    };
-  }
-
-  const data = String(res.data || "");
-
-  if (
-    res.status === 403 ||
-    data.includes("not available in your location") ||
-    data.includes("Service area restriction") ||
-    data.includes("not available in your country")
-  ) {
-    return {
-      ok: false,
-      text: "❌ 不支持",
-    };
-  }
-
-  let region = extractPrimeRegion(data);
-
-  if (res.status >= 200 && res.status < 400) {
-    return {
-      ok: true,
-      text: region ? `✅ 可访问 ${region}` : "✅ 可访问，地区未知",
-    };
-  }
-
-  return {
-    ok: false,
-    text: `⚠️ 状态异常 HTTP ${res.status}`,
-  };
-}
-
-function extractPrimeRegion(data) {
-  const patterns = [
-    /"currentTerritory"\s*:\s*"([A-Z]{2})"/i,
-    /"territory"\s*:\s*"([A-Z]{2})"/i,
-    /"countryCode"\s*:\s*"([A-Z]{2})"/i,
-    /"geoCountry"\s*:\s*"([A-Z]{2})"/i,
-    /"marketplaceCountry"\s*:\s*"([A-Z]{2})"/i,
-  ];
-
-  for (const p of patterns) {
-    const m = data.match(p);
-    if (m && m[1]) return m[1].toUpperCase();
-  }
-
-  return "";
-}
-
-function notifyIfChanged(content) {
+function notifyIfChanged(signature, summary) {
   const key = "stream_group_unlock_last_result";
   const old = $persistentStore.read(key);
 
-  if (old && old !== content) {
-    $notification.post("流媒体检测结果变化", "", content, {
-      sound: true,
-    });
+  if (old && old !== signature) {
+    $notification.post("流媒体检测结果变化", "", summary, { sound: true });
   }
 
-  $persistentStore.write(content, key);
+  $persistentStore.write(signature, key);
 }
 
 function hasAnyFailure(content) {
@@ -901,10 +688,7 @@ function stringifyError(e) {
   }
 }
 
-function formatTime(date) {
+function formatShortTime(date) {
   const pad = (n) => String(n).padStart(2, "0");
-  return (
-    `${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` +
-    `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
-  );
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
