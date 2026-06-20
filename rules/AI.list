@@ -1,82 +1,88 @@
-# Chatgpt
-DOMAIN,browser-intake-datadoghq.com
-DOMAIN,chat.openai.com.cdn.cloudflare.net
+# ==============================
+# ChatGPT / OpenAI
+# ==============================
+
+# 登录、人机验证、资源与后端
 DOMAIN,openai-api.arkoselabs.com
+DOMAIN,client-api.arkoselabs.com
 DOMAIN,openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net
 DOMAIN,openaicomproductionae4b.blob.core.windows.net
 DOMAIN,production-openaicom-storage.azureedge.net
-DOMAIN,static.cloudflareinsights.com
+
+# ChatGPT 主站、API、静态资源、附件
+DOMAIN,ws.chatgpt.com
 DOMAIN-SUFFIX,ai.com
-DOMAIN-SUFFIX,algolia.net
-DOMAIN-SUFFIX,api.statsig.com
-DOMAIN-SUFFIX,auth0.com
 DOMAIN-SUFFIX,chatgpt.com
-DOMAIN-SUFFIX,chatgpt.livekit.cloud
-DOMAIN-SUFFIX,client-api.arkoselabs.com
-DOMAIN-SUFFIX,events.statsigapi.net
-DOMAIN-SUFFIX,featuregates.org
-DOMAIN-SUFFIX,host.livekit.cloud
-DOMAIN-SUFFIX,identrust.com
-DOMAIN-SUFFIX,intercom.io
-DOMAIN-SUFFIX,intercomcdn.com
-DOMAIN-SUFFIX,launchdarkly.com
 DOMAIN-SUFFIX,oaistatic.com
 DOMAIN-SUFFIX,oaiusercontent.com
-DOMAIN-SUFFIX,observeit.net
 DOMAIN-SUFFIX,openai.com
 DOMAIN-SUFFIX,openaiapi-site.azureedge.net
 DOMAIN-SUFFIX,openaicom.imgix.net
-DOMAIN-SUFFIX,segment.io
-DOMAIN-SUFFIX,sentry.io
-DOMAIN-SUFFIX,stripe.com
-DOMAIN-SUFFIX,turn.livekit.cloud
+
+# 语音模式 / 实时通话
+DOMAIN-SUFFIX,chatgpt.livekit.cloud
+DOMAIN,host.livekit.cloud
+DOMAIN,turn.livekit.cloud
+
+# 新 OpenAI 域名的低优先级兜底
 DOMAIN-KEYWORD,openai
-IP-CIDR,24.199.123.28/32,no-resolve
-IP-CIDR,64.23.132.171/32,no-resolve
-IP-ASN,20473,no-resolve
 
-# Gemini
+
+# ==============================
+# Gemini / Google AI
+# ==============================
+
+# Gemini 网页与 App
+DOMAIN,gemini.google.com
+DOMAIN,bard.google.com
+DOMAIN,aistudio.google.com
 DOMAIN,ai.google.dev
-DOMAIN,alkalimakersuite-pa.clients6.google.com
 DOMAIN,makersuite.google.com
-DOMAIN-SUFFIX,bard.google.com
-DOMAIN-SUFFIX,deepmind.com
-DOMAIN-SUFFIX,deepmind.google
-DOMAIN-SUFFIX,gemini.google.com
-DOMAIN-SUFFIX,generativeai.google
-DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com
-DOMAIN-SUFFIX,apis.google.com
-DOMAIN-KEYWORD,colab
-DOMAIN-KEYWORD,developerprofiles
-DOMAIN-KEYWORD,generativelanguage
+DOMAIN-SUFFIX,gemini.google
 
-# Apple Intelligence
-DOMAIN,guzzoni.apple.com
-DOMAIN-SUFFIX,smoot.apple.com
-DOMAIN-SUFFIX,apple-relay.cloudflare.com
-DOMAIN-SUFFIX,apple-relay.fastly-edge.com
-DOMAIN-SUFFIX,cp4.cloudflare.com
-DOMAIN-SUFFIX,apple-relay.apple.com
-DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com
+# Gemini API / AI Studio 后端
+DOMAIN,alkalimakersuite-pa.clients6.google.com
+DOMAIN,generativelanguage.googleapis.com
+DOMAIN,generativelanguage-pa.googleapis.com
+DOMAIN,proactivebackend-pa.googleapis.com
 
-# Copilot
-DOMAIN,api.msn.com
-DOMAIN,api.statsig.com
-DOMAIN,assets.msn.com
-DOMAIN,copilot.microsoft.com
+# 仅在使用 Google Colab 时保留
+DOMAIN,colab.research.google.com
+
+
+# ==============================
+# Microsoft Copilot
+# ==============================
+
+# Copilot 主服务
+DOMAIN-SUFFIX,copilot.microsoft.com
+DOMAIN,sydney.bing.com
+DOMAIN,services.bingapis.com
+DOMAIN-SUFFIX,edgeservices.bing.com
 DOMAIN,gateway.bingviz.microsoft.net
 DOMAIN,gateway.bingviz.microsoftapp.net
-DOMAIN,in.appcenter.ms
-DOMAIN,location.microsoft.com
-DOMAIN,odc.officeapps.live.com
-DOMAIN,r.bing.com
-DOMAIN,self.events.data.microsoft.com
-DOMAIN,services.bingapis.com
-DOMAIN,sydney.bing.com
-DOMAIN,www.bing.com
+
+# Copilot App 资源与接口
 DOMAIN-SUFFIX,api.microsoftapp.net
-DOMAIN-SUFFIX,bing-shopping.microsoft-falcon.io
-DOMAIN-SUFFIX,challenges.cloudflare.com
-DOMAIN-SUFFIX,edgeservices.bing.com
-DOMAIN-KEYWORD,openaicom-api
-IP-ASN,14061,no-resolve
+DOMAIN,api.msn.com
+DOMAIN,assets.msn.com
+
+# 仅在浏览器通过 Bing Chat 使用 Copilot 时保留
+DOMAIN,www.bing.com
+
+
+# ==============================
+# Apple Intelligence / Siri / Private Cloud Compute
+# ==============================
+
+DOMAIN,guzzoni.apple.com
+DOMAIN-SUFFIX,smoot.apple.com
+
+# Private Cloud Compute
+DOMAIN,apple-relay.cloudflare.com
+DOMAIN,apple-relay.fastly-edge.com
+DOMAIN,cp4.cloudflare.com
+
+# Apple Intelligence Extensions
+DOMAIN,apple-relay.apple.com
+DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com
