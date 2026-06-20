@@ -340,12 +340,11 @@ function compactPolicyName(name) {
   return text.length > 23 ? text.slice(0, 22) + "…" : text;
 }
 
-function compactProvider(info) {
-  const text = String((info && (info.isp || info.org)) || "未知服务商")
+function fullProvider(info) {
+  // 不截断运营商名称；面板会自动换行完整显示。
+  return String((info && (info.isp || info.org)) || "未知服务商")
     .replace(/\s+/g, " ")
     .trim();
-
-  return text.length > 18 ? text.slice(0, 17) + "…" : text;
 }
 
 function proxyMetrics(quality) {
@@ -358,7 +357,7 @@ function formatIPLine(label, info) {
     return label + "：检测失败" + (info && info.ms ? " · " + info.ms + "ms" : "");
   }
 
-  return label + "：" + info.ip + " · " + compactProvider(info);
+  return label + "：" + info.ip + " · " + fullProvider(info);
 }
 
 async function main() {
