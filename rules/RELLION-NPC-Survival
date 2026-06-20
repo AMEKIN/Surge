@@ -9,3 +9,9 @@ DOMAIN-SUFFIX,rellion.daerisoft.com
 DOMAIN,config.uca.cloud.unity3d.com
 DOMAIN,d1nwgis9k7jfpx.cloudfront.net
 DOMAIN,cdp.cloud.unity3d.com
+
+# 游戏激励广告 / 广告加载实际命中
+DOMAIN,rt.applovin.com
+DOMAIN,ms.applovin.com
+DOMAIN,googleads.g.doubleclick.net
+DOMAIN,app-analytics-services.com
