@@ -108,23 +108,6 @@ DOMAIN-SUFFIX,kindleoasisnews.com
 DOMAIN-SUFFIX,createspace.com
 
 # ==============================
-# Prime Video / Amazon Video
-# ==============================
-DOMAIN-SUFFIX,aiv-cdn.net
-DOMAIN-SUFFIX,aiv-delivery.net
-DOMAIN-SUFFIX,amazonprimevideos.com
-DOMAIN-SUFFIX,amazonvideo.cc
-DOMAIN-SUFFIX,amazonvideo.com
-DOMAIN-SUFFIX,prime-video.com
-DOMAIN-SUFFIX,primevideo.cc
-DOMAIN-SUFFIX,primevideo.com
-DOMAIN-SUFFIX,primevideo.info
-DOMAIN-SUFFIX,primevideo.org
-DOMAIN-SUFFIX,primevideo.tv
-DOMAIN-SUFFIX,pv-cdn.net
-DOMAIN,avodmp4s3ww-a.akamaihd.net
-
-# ==============================
 # AWS Official Website / Console
 # 不包含客户自建 S3、Lambda、CloudFront 等共享业务域名
 # ==============================
