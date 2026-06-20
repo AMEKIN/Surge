@@ -51,6 +51,7 @@ DOMAIN,crl4.digicert.com
 DOMAIN,ocsp.digicert.com
 DOMAIN,ocsp.digicert.cn
 
-# Apple 香港 CDN / aaplimg 边缘节点
+# Apple 边缘节点
 IP-CIDR,17.253.86.0/23,no-resolve
-
+IP-CIDR,17.253.150.10/32,no-resolve
+IP-CIDR,17.253.144.0/21,no-resolve
