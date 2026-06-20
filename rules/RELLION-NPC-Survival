@@ -15,10 +15,17 @@ DOMAIN,cdp.cloud.unity3d.com
 # ==============================
 # 游戏激励广告 / 广告加载实际命中
 # ==============================
+# Google Ads
 DOMAIN,lh3.googleadsserving.cn
+DOMAIN,googleads.g.doubleclick.net
+DOMAIN,tpc.googlesyndication.com
+DOMAIN,pagead2.googlesyndication.com
+
+# AppLovin / MAX
 DOMAIN,rt.applovin.com
 DOMAIN,ms.applovin.com
-DOMAIN,googleads.g.doubleclick.net
-DOMAIN,app-analytics-services.com
 DOMAIN-SUFFIX,applovin.com
+
+# Firebase / 广告分析与回调
+DOMAIN,app-analytics-services.com
 DOMAIN-SUFFIX,doubleclick.net
