@@ -8,9 +8,7 @@ DOMAIN-SUFFIX,apple.com.cn
 DOMAIN-SUFFIX,apple.cn
 DOMAIN-SUFFIX,safebrowsing.apple
 
-# ==============================
 # iCloud
-# ==============================
 DOMAIN-SUFFIX,icloud.com
 DOMAIN-SUFFIX,icloud.com.cn
 DOMAIN-SUFFIX,icloud-content.com
@@ -20,18 +18,14 @@ DOMAIN-SUFFIX,apple-livephotoskit.com
 DOMAIN-SUFFIX,cdn-apple.com
 DOMAIN-SUFFIX,apzones.com
 
-# ==============================
 # App Store
-# ==============================
 DOMAIN-SUFFIX,mzstatic.com
 DOMAIN-SUFFIX,itunes.com
 DOMAIN-SUFFIX,aaplimg.com
 DOMAIN-SUFFIX,appsto.re
 DOMAIN-SUFFIX,itun.es
 
-# ==============================
 # Apple Services
-# ==============================
 DOMAIN-SUFFIX,apple-mapkit.com
 DOMAIN-SUFFIX,axm-usercontent-apple.com
 DOMAIN-SUFFIX,apple.news
@@ -41,9 +35,7 @@ DOMAIN-SUFFIX,musickit.net
 DOMAIN-SUFFIX,me.com
 DOMAIN-SUFFIX,mac.com
 
-# ==============================
 # Apple External Services
-# ==============================
 DOMAIN,apple-events.akamaized.net
 DOMAIN,p-events-delivery.akamaized.net
 DOMAIN,lookup-api.apple.com.edgekey.net
@@ -53,9 +45,7 @@ DOMAIN,appleworldwidedeveloper.sc.omtrdc.net
 DOMAIN,beatselectronicsllc.tt.omtrdc.net
 DOMAIN,e16991.b.akamaiedge.net
 
-# ==============================
 # Apple Certificate
-# ==============================
 DOMAIN,crl3.digicert.com
 DOMAIN,crl4.digicert.com
 DOMAIN,ocsp.digicert.com
