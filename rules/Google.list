@@ -322,3 +322,9 @@ DOMAIN-SUFFIX,x.company
 # Firebase Crashlytics
 # ==============================
 DOMAIN-SUFFIX,crashlytics.com
+
+# ==============================
+# Firebase Realtime Database
+# ==============================
+DOMAIN-SUFFIX,firebaseio.com
+DOMAIN-SUFFIX,firebasedatabase.app
