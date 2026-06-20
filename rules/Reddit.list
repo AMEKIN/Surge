@@ -1,9 +1,18 @@
+# ==============================
 # Reddit
-DOMAIN-SUFFIX,redd.it
+# ==============================
 DOMAIN-SUFFIX,reddit.com
-DOMAIN-SUFFIX,redditmail.com
-DOMAIN-SUFFIX,redditmedia.com
+DOMAIN-SUFFIX,redd.it
 DOMAIN-SUFFIX,redditstatic.com
+DOMAIN-SUFFIX,redditmedia.com
 DOMAIN-SUFFIX,reddituploads.com
-DOMAIN-SUFFIX,reddituploads.com.cdn-cf.behance.net
-DOMAIN-SUFFIX,reddituploads.com.cdn-cf.dropbox.com
+DOMAIN-SUFFIX,redditmail.com
+
+# ==============================
+# Reddit Services
+# ==============================
+DOMAIN-SUFFIX,reddithelp.com
+DOMAIN,reddit.zendesk.com
+DOMAIN-SUFFIX,redditinc.com
+DOMAIN-SUFFIX,redditforcommunity.com
+DOMAIN-SUFFIX,redditblog.com
