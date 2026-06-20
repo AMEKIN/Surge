@@ -8,27 +8,19 @@ DOMAIN-SUFFIX,cloudflare-cn.com
 DOMAIN-SUFFIX,cloudflarecn.net
 DOMAIN-SUFFIX,cloudflarestatus.com
 
-# ==============================
 # Cloudflare DNS
-# ==============================
 DOMAIN-SUFFIX,cloudflare-dns.com
 DOMAIN-SUFFIX,one.one.one
 
-# ==============================
 # Cloudflare WARP
-# ==============================
 DOMAIN-SUFFIX,cloudflareclient.com
 DOMAIN-SUFFIX,warp.plus
 
-# ==============================
 # Cloudflare Zero Trust
-# ==============================
 DOMAIN-SUFFIX,cloudflareaccess.com
 DOMAIN-SUFFIX,trycloudflare.com
 
-# ==============================
 # Cloudflare Developer
-# ==============================
 DOMAIN-SUFFIX,cloudflareapps.com
 DOMAIN-SUFFIX,pages.dev
 DOMAIN-SUFFIX,workers.dev
@@ -37,15 +29,11 @@ DOMAIN-SUFFIX,cloudflarestream.com
 DOMAIN-SUFFIX,cloudflarestorage.com
 DOMAIN-SUFFIX,cloudflarestoragegw.com
 
-# ==============================
 # Cloudflare Analytics
-# ==============================
 DOMAIN-SUFFIX,cloudflareinsights.com
 DOMAIN-SUFFIX,cloudflareinsights-cn.com
 
-# ==============================
 # Cloudflare CDN IP
-# ==============================
 IP-CIDR,103.21.244.0/22,no-resolve
 IP-CIDR,103.22.200.0/22,no-resolve
 IP-CIDR,103.31.4.0/22,no-resolve
