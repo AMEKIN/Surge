@@ -1,0 +1,177 @@
+# ==============================
+# Amazon
+# ==============================
+
+# ==============================
+# Amazon Retail / Account / Payments
+# ==============================
+DOMAIN-SUFFIX,a2z.com
+DOMAIN-SUFFIX,amzn.asia
+DOMAIN-SUFFIX,amzn.com
+DOMAIN-SUFFIX,amzn.to
+DOMAIN-SUFFIX,amznl.com
+DOMAIN-SUFFIX,amazon.ae
+DOMAIN-SUFFIX,amazon.ca
+DOMAIN-SUFFIX,amazon.co.jp
+DOMAIN-SUFFIX,amazon.co.uk
+DOMAIN-SUFFIX,amazon.co.za
+DOMAIN-SUFFIX,amazon.com
+DOMAIN-SUFFIX,amazon.com.au
+DOMAIN-SUFFIX,amazon.com.be
+DOMAIN-SUFFIX,amazon.com.br
+DOMAIN-SUFFIX,amazon.com.mx
+DOMAIN-SUFFIX,amazon.com.tr
+DOMAIN-SUFFIX,amazon.de
+DOMAIN-SUFFIX,amazon.eg
+DOMAIN-SUFFIX,amazon.es
+DOMAIN-SUFFIX,amazon.fr
+DOMAIN-SUFFIX,amazon.ie
+DOMAIN-SUFFIX,amazon.in
+DOMAIN-SUFFIX,amazon.it
+DOMAIN-SUFFIX,amazon.jp
+DOMAIN-SUFFIX,amazon.nl
+DOMAIN-SUFFIX,amazon.pl
+DOMAIN-SUFFIX,amazon.sa
+DOMAIN-SUFFIX,amazon.se
+DOMAIN-SUFFIX,amazon.sg
+DOMAIN-SUFFIX,amazonpay.com
+DOMAIN-SUFFIX,amazonpay.in
+DOMAIN-SUFFIX,amazontrust.com
+
+# ==============================
+# Amazon Retail Static / Affiliate
+# ==============================
+DOMAIN-SUFFIX,amazonimages.com
+DOMAIN-SUFFIX,media-amazon.com
+DOMAIN-SUFFIX,associates-amazon.com
+
+# 已由 China.list 单独维护，不在此重复：
+# DOMAIN-SUFFIX,images-amazon.com
+# DOMAIN-SUFFIX,ssl-images-amazon.com
+
+# ==============================
+# Amazon Business / Devices / Developer
+# ==============================
+DOMAIN-SUFFIX,amazon.jobs
+DOMAIN-SUFFIX,amazonappstore.com
+DOMAIN-SUFFIX,amazonappservices.com
+DOMAIN-SUFFIX,amazonbusiness.com
+DOMAIN-SUFFIX,amazonbusiness.org
+DOMAIN-SUFFIX,amazonbusinessblog.com
+DOMAIN-SUFFIX,amazondevicesupport.com
+DOMAIN-SUFFIX,amazonfctours.com
+DOMAIN-SUFFIX,amazonlaunchpad.com
+DOMAIN-SUFFIX,amazongames.com
+DOMAIN-SUFFIX,amazonluna.com
+DOMAIN-SUFFIX,amazonvideodirect.com
+
+# ==============================
+# Alexa / Amazon Music
+# ==============================
+DOMAIN-SUFFIX,alexa.com
+DOMAIN-SUFFIX,amazonalexavoxcon.com
+DOMAIN-SUFFIX,amazonmusic.com
+
+# ==============================
+# Audible
+# ==============================
+DOMAIN-SUFFIX,audible.com
+DOMAIN-SUFFIX,audible.ca
+DOMAIN-SUFFIX,audible.co.jp
+DOMAIN-SUFFIX,audible.co.uk
+DOMAIN-SUFFIX,audible.com.au
+DOMAIN-SUFFIX,audible.com.br
+DOMAIN-SUFFIX,audible.de
+DOMAIN-SUFFIX,audible.es
+DOMAIN-SUFFIX,audible.fr
+DOMAIN-SUFFIX,audible.in
+DOMAIN-SUFFIX,audible.it
+
+# ==============================
+# Kindle / Books
+# ==============================
+DOMAIN-SUFFIX,kindle.co.jp
+DOMAIN-SUFFIX,kindle.co.uk
+DOMAIN-SUFFIX,kindle.com
+DOMAIN-SUFFIX,kindle.de
+DOMAIN-SUFFIX,kindle.es
+DOMAIN-SUFFIX,kindle.fr
+DOMAIN-SUFFIX,kindle.in
+DOMAIN-SUFFIX,kindle.it
+DOMAIN-SUFFIX,kindle.jp
+DOMAIN-SUFFIX,kindleoasis.com
+DOMAIN-SUFFIX,kindleoasis.info
+DOMAIN-SUFFIX,kindleoasis.jp
+DOMAIN-SUFFIX,kindleoasis.org
+DOMAIN-SUFFIX,kindleoasis.us
+DOMAIN-SUFFIX,kindleoasisnews.com
+DOMAIN-SUFFIX,createspace.com
+
+# ==============================
+# Prime Video / Amazon Video
+# ==============================
+DOMAIN-SUFFIX,aiv-cdn.net
+DOMAIN-SUFFIX,aiv-delivery.net
+DOMAIN-SUFFIX,amazonprimevideos.com
+DOMAIN-SUFFIX,amazonvideo.cc
+DOMAIN-SUFFIX,amazonvideo.com
+DOMAIN-SUFFIX,prime-video.com
+DOMAIN-SUFFIX,primevideo.cc
+DOMAIN-SUFFIX,primevideo.com
+DOMAIN-SUFFIX,primevideo.info
+DOMAIN-SUFFIX,primevideo.org
+DOMAIN-SUFFIX,primevideo.tv
+DOMAIN-SUFFIX,pv-cdn.net
+DOMAIN,avodmp4s3ww-a.akamaihd.net
+
+# ==============================
+# AWS Official Website / Console
+# 不包含客户自建 S3、Lambda、CloudFront 等共享业务域名
+# ==============================
+DOMAIN-SUFFIX,aws.dev
+DOMAIN-SUFFIX,awsapps.com
+DOMAIN-SUFFIX,awsautopilot.com
+DOMAIN-SUFFIX,awsbraket.com
+DOMAIN-SUFFIX,awscloud.com
+DOMAIN-SUFFIX,awscommandlineinterface.com
+DOMAIN-SUFFIX,awsedstart.com
+DOMAIN-SUFFIX,awseducate.com
+DOMAIN-SUFFIX,awseducate.net
+DOMAIN-SUFFIX,awseducate.org
+DOMAIN-SUFFIX,awssecworkshops.com
+DOMAIN-SUFFIX,awsstatic.com
+DOMAIN-SUFFIX,awsthinkbox.com
+DOMAIN-SUFFIX,awstrust.com
+DOMAIN-SUFFIX,cdkworkshop.com
+DOMAIN-SUFFIX,containersonaws.com
+DOMAIN-SUFFIX,signin.aws
+DOMAIN-SUFFIX,amazonworkdocs.com
+DOMAIN-SUFFIX,thinkboxsoftware.com
+
+# ==============================
+# Amazon Entertainment / Brands
+# ==============================
+DOMAIN-SUFFIX,boxofficemojo.com
+DOMAIN-SUFFIX,goodreads.com
+DOMAIN-SUFFIX,imdb.com
+DOMAIN-SUFFIX,imdb.to
+DOMAIN-SUFFIX,media-imdb.com
+DOMAIN-SUFFIX,wholecitiesfoundation.org
+DOMAIN-SUFFIX,wholefoods.com
+DOMAIN-SUFFIX,wholefoodsmarket.com
+DOMAIN-SUFFIX,wholefoodsmarket.co.uk
+DOMAIN-SUFFIX,wholekidsfoundation.org
+DOMAIN-SUFFIX,wholeplanetfoundation.org
+DOMAIN-SUFFIX,wfm.com
+DOMAIN-SUFFIX,zappos.com
+
+# ==============================
+# 以下共享基础设施刻意不加入
+# 它们承载大量第三方 App / 游戏 / S3 Bucket / CDN 内容
+# ==============================
+# DOMAIN-SUFFIX,amazonaws.com
+# DOMAIN-SUFFIX,amazonaws.com.cn
+# DOMAIN-SUFFIX,amazonaws-china.com
+# DOMAIN-SUFFIX,cloudfront.net
+# DOMAIN-SUFFIX,amplifyapp.com
+# DOMAIN-SUFFIX,elasticbeanstalk.com
