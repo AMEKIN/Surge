@@ -1,10 +1,10 @@
-#!name=Proxy 节点测速
-#!desc=测试 Proxy 策略组当前出口的 Cloudflare 延迟、下载与上传速度。单次总测速窗口上限为 10 秒。
+#!name=Proxy 安全测速
+#!desc=测速 Proxy 策略组当前出口的 Cloudflare 延迟、下载与上传速度。总测速上限 10 秒，采用低内存安全模式。
 #!system=ios
 #!arguments=PROXY_GROUP:Proxy,TEST_SECONDS:10
 
 [Panel]
-Proxy节点测速 = title="Proxy 节点测速",content="点击刷新测速",style=info,script-name=Proxy节点测速V1
+Proxy节点测速 = title="Proxy 节点测速",content="点击刷新测速",style=info,script-name=Proxy安全测速V2
 
 [Script]
-Proxy节点测速V1 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/proxy-speedtest.js?v=20260621v1,script-update-interval=3600,timeout=13,engine=jsc
+Proxy安全测速V2 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/proxy-speedtest.js?v=20260621v2,script-update-interval=3600,timeout=12,engine=webview
