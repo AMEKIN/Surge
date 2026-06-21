@@ -1,9 +1,9 @@
-#!name=Proxy 节点测速
-#!desc=测试 Proxy 策略组当前出口的 Cloudflare 延迟、下载、上传速度。总测速时限 10 秒。
+#!name=Proxy 轻量测速
+#!desc=测试 Proxy 策略组当前出口的 Cloudflare 延迟、下载、上传速度。总测速窗口为 10 秒，使用低内存 WebView 引擎。
 #!system=ios
 
 [Panel]
-Proxy节点测速 = title="Proxy 节点测速",content="点击刷新测速",style=info,script-name=Proxy节点测速V3
+Proxy轻量测速 = title="Proxy 节点测速",content="点击刷新测速",style=info,script-name=Proxy轻量测速V4
 
 [Script]
-Proxy节点测速V3 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/proxy-speedtest.js?v=20260621v3,script-update-interval=3600,timeout=12,engine=jsc
+Proxy轻量测速V4 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/proxy-speedtest.js?v=20260621v4,script-update-interval=3600,timeout=12,engine=webview
