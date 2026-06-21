@@ -1,8 +1,5 @@
 自定义规则订阅连接
 
-AppleArcade 
-https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rules/AppleArcade.list
-
 ネコぱら セカイコネクト（NekoparaSekaiConnect） 
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rules/NekoparaSekaiConnect.list
 
