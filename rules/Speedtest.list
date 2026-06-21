@@ -1,0 +1,28 @@
+# ==============================
+# Speedtest by Ookla
+# ==============================
+
+# Speedtest 核心：API、配置、服务器目录、结果、官方测速节点
+DOMAIN-SUFFIX,speedtest.net
+
+# Ookla 主服务与测速节点平台
+DOMAIN-SUFFIX,ookla.com
+DOMAIN-SUFFIX,ooklaserver.net
+
+# Speedtest 静态资源 / CDN
+DOMAIN-SUFFIX,cdnst.net
+DOMAIN,www.speedtest.net.cdn.cloudflare.net
+
+# Ookla / Speedtest 关联服务
+DOMAIN-SUFFIX,pingtest.net
+DOMAIN-SUFFIX,speedtest.co
+DOMAIN-SUFFIX,speedtestcustom.com
+DOMAIN-SUFFIX,webtest.net
+
+# Ookla 关联网络测绘与企业服务
+DOMAIN-SUFFIX,cellmaps.com
+DOMAIN-SUFFIX,ekahau.com
+DOMAIN-SUFFIX,ekahau.cloud
+
+# 已收录的合作测速节点
+DOMAIN,ookla-speedtest-central.hgconair.hgc.com.hk
