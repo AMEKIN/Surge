@@ -20,6 +20,7 @@ DOMAIN,lh3.googleadsserving.cn
 DOMAIN,googleads.g.doubleclick.net
 DOMAIN,tpc.googlesyndication.com
 DOMAIN,pagead2.googlesyndication.com
+DOMAIN,www.googletagservices.com
 
 # AppLovin / MAX
 DOMAIN,rt.applovin.com
