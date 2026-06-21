@@ -21,3 +21,9 @@ DOMAIN,palcy.jp
 # Pixiv Corporate / Media
 # ==============================
 DOMAIN,inside.pixiv.blog
+
+# ==============================
+# TikTok / ByteDance CDN 素材
+# ==============================
+DOMAIN,p16-sign-sg.tiktokcdn.com
+DOMAIN,p16-common-sign.tiktokcdn.com
