@@ -26,3 +26,6 @@ DOMAIN-SUFFIX,ekahau.cloud
 
 # 已收录的合作测速节点
 DOMAIN,ookla-speedtest-central.hgconair.hgc.com.hk
+
+# SoSIM / 3HK Speedtest 测速节点
+DOMAIN,sosimhk.datapath.three.com.hk
