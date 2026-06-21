@@ -1,0 +1,13 @@
+# ==============================
+# CUniq / MyCUniq / CUniqGO
+# 中国联通（香港）CUniq 官方服务、账户管理、商城、eSIM、充值及区域站点
+# ==============================
+
+# 香港 / 全球主服务
+DOMAIN-SUFFIX,cuniq.com
+
+# 日本 CUniq JP
+DOMAIN-SUFFIX,cuniq.jp
+
+# 新加坡 CUniq SG
+DOMAIN-SUFFIX,cuniq.sg
