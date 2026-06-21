@@ -2,7 +2,7 @@
 // 展示：路径 / 当前节点 / 直连 IP+服务商 / 代理 IP+服务商 / 代理网络质量
 
 const PANEL_TITLE = "网络出口检测";
-const TARGET_GROUP = "FINAL";
+const TARGET_GROUP = "Proxy";
 
 // 仅测代理质量；两次采样可保留基础抖动参考，同时缩短刷新时间。
 const SAMPLE_COUNT = 2;
