@@ -1,0 +1,50 @@
+# ==============================
+# Epic 平台核心
+# 覆盖账号、商店、库、授权、好友、启动器、下载接口、追踪、
+# Epic Online Services 的 ol / ak / on 子域等
+# ==============================
+DOMAIN-SUFFIX,epicgames.com
+DOMAIN-SUFFIX,epicgames.dev
+
+# ==============================
+# Unreal Engine
+# 覆盖 Unreal Engine 官网、文档、Launcher 引擎下载 CDN、
+# Marketplace 历史资源、插件与引擎相关接口
+# ==============================
+DOMAIN-SUFFIX,unrealengine.com
+
+# ==============================
+# Epic Games Launcher 外部下载 / 登录验证
+# Epic 官方允许列表中的特殊第三方域名
+# ==============================
+DOMAIN,epicgames-download1.akamaized.net
+DOMAIN-SUFFIX,hcaptcha.com
+DOMAIN,epic-games-api.arkoselabs.com
+DOMAIN,cdn.arkoselabs.com
+
+# ==============================
+# Fab / Unreal 资产库 / Marketplace 新入口
+# ==============================
+DOMAIN-SUFFIX,fab.com
+
+# ==============================
+# Quixel Bridge / Megascans / Mixer
+# ==============================
+DOMAIN-SUFFIX,quixel.com
+
+# ==============================
+# Twinmotion / RealityScan
+# ==============================
+DOMAIN-SUFFIX,twinmotion.com
+DOMAIN-SUFFIX,realityscan.com
+
+# Twinmotion 云端库搜索服务
+DOMAIN,firc2czwza-dsn.algolia.net
+
+# ==============================
+# Epic 自营游戏网站
+# 不包含各游戏开发商自建联机服务器与第三方 CDN
+# ==============================
+DOMAIN-SUFFIX,fortnite.com
+DOMAIN-SUFFIX,rocketleague.com
+DOMAIN-SUFFIX,fallguys.com
