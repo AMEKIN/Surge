@@ -1,0 +1,63 @@
+# ==============================
+# 过时登陆域名，不影响使用
+# ==============================
+DOMAIN,sdk.open.talk.gepush.com
+
+# ==============================
+# 美团：代理环境下可能请求的无公网解析诊断域名
+# ==============================
+DOMAIN,maplocatesdksnapshot.d.meituan.net
+
+# ==============================
+# KFC 无效广告/追踪请求
+# ==============================
+DOMAIN,adttrackingprd.hwwt8.com
+
+# ==============================
+# JPush IPv6 探测；当前 IPv6 已关闭
+# ==============================
+DOMAIN,status-ipv6.jpush.cn
+
+# ==============================
+# MyCUniq App 生成的无效域名
+# ==============================
+DOMAIN,zfb.cuniq.comundefined
+
+# ==============================
+# Pixiv 实际命中：广告 SDK / 归因 / 行为统计
+# ==============================
+DOMAIN,analytics-ios-tcp.rayjump.com
+DOMAIN,configure.rayjump.com
+DOMAIN,policy.rayjump.com
+DOMAIN,odf.app-ads-services.com
+DOMAIN,impression-east.liftoff.io
+DOMAIN,lazy.rayjump.com
+DOMAIN,check.rayjump.com
+DOMAIN,d1tru86qrby720.cloudfront.net
+
+# Pixiv Liftoff 广告曝光 / 回传
+DOMAIN,impression-east.liftoff.io
+# Pixiv Mintegral 广告 SDK 观测上报
+DOMAIN,observe-tcp.mintegral.net
+
+# ==============================
+# Niconico实际命中： InMobi 移动广告
+# ==============================
+DOMAIN,ads.inmobi.com
+
+# ==============================
+# Speedtest 实际命中：广告与统计请求
+# ==============================
+DOMAIN,media.admob.com
+DOMAIN,mads.amazon-adsystem.com
+DOMAIN,ssl.google-analytics.com
+
+# ==============================
+# QQ 实际命中：疑似失效的裸 IP 后台请求
+# ==============================
+IP-CIDR,120.233.51.141/32,no-resolve 
+
+# ==============================
+# 减少Telegram 转圈
+# ==============================
+IP-CIDR,95.161.76.100/31,pre-matching,no-resolve
