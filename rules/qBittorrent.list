@@ -1,0 +1,20 @@
+# ==============================
+# qBittorrent Core Related Domains
+# ==============================
+
+# Official / update
+DOMAIN-SUFFIX,qbittorrent.org
+DOMAIN-SUFFIX,github.com
+
+# Common public tracker domains
+DOMAIN-SUFFIX,opentrackr.org
+DOMAIN-SUFFIX,openbittorrent.com
+DOMAIN-SUFFIX,torrent.eu.org
+DOMAIN-SUFFIX,tracker.torrent.eu.org
+
+# Optional legacy / fallback trackers
+DOMAIN-SUFFIX,bitsearch.to
+DOMAIN-SUFFIX,leechers-paradise.org
+
+# RSS / torrent index sites (optional, depends on user usage)
+# DOMAIN-SUFFIX (add your sources manually here)
