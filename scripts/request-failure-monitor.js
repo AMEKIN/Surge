@@ -1,4 +1,4 @@
-// Surge Panel: Request Failure Monitor V1
+// Surge Panel: Request Failure Monitor V2
 // 手动扫描最近请求中的网络失败、超时与 HTTP 5xx。
 // 默认排除 REJECT 与 HTTP 4xx，避免广告拦截和普通 404 造成噪声。
 
@@ -291,16 +291,15 @@
     }
 
     if (total === 0) {
-      $done({
-        title: PANEL_TITLE,
-        content: [
-          "近 " + scanned.length + " 条：未发现失败请求",
-          "已排除 REJECT、HTTP 4xx",
-          "更新：" + nowText()
-        ].join("\n"),
-        style: "good"
+  $done({
+    title: PANEL_TITLE,
+    content: [
+      "近 " + scanned.length + " 条：未发现失败请求",
+      "更新：" + nowText()
+    ].join("\n"),
+    style: "good"
       });
-      return;
+  return;
     }
 
     sorted = list.sort(function (a, b) {
