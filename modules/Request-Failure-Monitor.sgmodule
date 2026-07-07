@@ -1,0 +1,9 @@
+#!name=请求失败监控
+#!desc=手动扫描最近请求中的网络失败、超时、DNS 失败与 HTTP 5xx；默认排除 REJECT 和 HTTP 4xx。
+#!system=ios
+
+[Panel]
+请求失败监控 = title="请求失败监控",content="点击刷新检查",style=info,script-name=请求失败监控V1
+
+[Script]
+请求失败监控V1 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/request-failure-monitor.js?v=20260707v1,script-update-interval=3600,timeout=10,engine=webview
