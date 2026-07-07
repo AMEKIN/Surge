@@ -1,0 +1,16 @@
+# ==============================
+# NAVER 韩国主站、账号、搜索、Cafe、Blog、地图、购物、
+# Game Lounge、Webtoon Korea、开发者 API 与静态资源
+# ==============================
+
+# NAVER 核心服务
+DOMAIN-SUFFIX,naver.com
+
+# NAVER 静态脚本、页面资源、分享组件等
+DOMAIN-SUFFIX,naver.net
+
+# NAVER 图片、封面、头像、帖子图片、Game Lounge 静态资源 CDN
+DOMAIN-SUFFIX,pstatic.net
+
+# 全球版 WEBTOON 是独立服务体系。
+DOMAIN-SUFFIX,webtoons.com
