@@ -1,0 +1,38 @@
+# ==============================
+# 巴哈姆特论坛 / 官方 App 社区服务
+# ==============================
+
+# 哈啦区论坛主体
+DOMAIN,forum.gamer.com.tw
+
+# 巴哈姆特官方 API
+# 包含论坛数据、登录态、发帖、图片上传、个人信息、通知等接口
+DOMAIN,api.gamer.com.tw
+
+# 账号登录、会员中心、权限与账户资料
+DOMAIN,user.gamer.com.tw
+
+# 巴友小屋、创作内容、个人主页
+DOMAIN,home.gamer.com.tw
+
+# 公会大厅与社区公会内容
+DOMAIN,guild.gamer.com.tw
+
+# 攻略百科与游戏资料页
+DOMAIN,wiki.gamer.com.tw
+DOMAIN,acg.gamer.com.tw
+
+# 官方网站、移动网页与新闻内容
+DOMAIN,www.gamer.com.tw
+DOMAIN,m.gamer.com.tw
+DOMAIN,gnn.gamer.com.tw
+
+# 勇者造型、头像与签名档
+DOMAIN,avatar1.gamer.com.tw
+DOMAIN,avatar2.bahamut.com.tw
+
+# 论坛 CSS、JavaScript、表情、图标等静态资源
+DOMAIN,i2.bahamut.com.tw
+
+# 帖子图片、进板图、用户上传图片、创作封面等
+DOMAIN,p2.bahamut.com.tw
