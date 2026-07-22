@@ -1,0 +1,21 @@
+# DeepSeek.list
+# DeepSeek 官方网站、App、网页对话、账号、API、开放平台、
+# 文档、模型调用、文件上传、静态资源、App 下载、政策及服务状态
+
+# DeepSeek 全部官方自营服务
+# 已覆盖：
+# www.deepseek.com
+# chat.deepseek.com
+# api.deepseek.com
+# platform.deepseek.com
+# api-docs.deepseek.com
+# static.deepseek.com
+# cdn.deepseek.com
+# download.deepseek.com
+# status.deepseek.com
+# talent.deepseek.com
+DOMAIN-SUFFIX,deepseek.com
+
+# DeepSeek 登录、注册及异常流量验证所使用的第三方验证码服务
+# hCaptcha 的资源子域可能随地区和时间变化，因此必须使用后缀规则
+DOMAIN-SUFFIX,hcaptcha.com
