@@ -52,7 +52,7 @@ https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/proxy-ip.
 6. 请求失败监控  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/Request-Failure-Monitor.sgmodule
 
-7. DeepSeek余额显示
+7. DeepSeek余额显示  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/DeepSeek-Balance.sgmodule
 
 
