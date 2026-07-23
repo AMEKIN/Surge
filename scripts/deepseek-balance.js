@@ -1,6 +1,6 @@
-// Surge Panel: DeepSeek Balance Monitor V2
-// 默认先按照 Surge 现有规则访问 DeepSeek。
-// 仅在传输层连接失败时，再通过备用策略组重试。
+// Surge Panel: DeepSeek Balance Monitor V3
+// 第一遍按照 Surge 现有规则分流。
+// 传输层连接失败时，再通过 PROXY_GROUP 指定的策略组重试。
 
 (function () {
   "use strict";
@@ -12,9 +12,8 @@
     typeof $argument === "string" ? $argument : ""
   );
 
-  var API_KEY = trim(args.DEEPSEEK_API_KEY);
-  var PRIMARY_POLICY = trim(args.PRIMARY_POLICY) || "RULE";
-  var FALLBACK_POLICY = trim(args.FALLBACK_POLICY) || "Proxy";
+  var API_KEY = trim(args.API_KEY);
+  var PROXY_GROUP = trim(args.PROXY_GROUP) || "Proxy";
   var LOW_BALANCE = parseNonNegativeNumber(
     args.LOW_BALANCE,
     5
@@ -61,6 +60,15 @@
     return String(
       value === null || value === undefined ? "" : value
     ).replace(/^\s+|\s+$/g, "");
+  }
+
+  function isUnresolvedPlaceholder(value) {
+    var text = trim(value);
+
+    return (
+      /^%[^%]+%$/.test(text) ||
+      /^\{\{\{[^}]+\}\}\}$/.test(text)
+    );
   }
 
   function parseNonNegativeNumber(value, fallback) {
@@ -112,23 +120,6 @@
     );
   }
 
-  function isRuleMode(policy) {
-    var normalized = trim(policy).toUpperCase();
-
-    return (
-      normalized === "" ||
-      normalized === "RULE" ||
-      normalized === "AUTO" ||
-      normalized === "DEFAULT"
-    );
-  }
-
-  function policyLabel(policy) {
-    return isRuleMode(policy)
-      ? "规则分流"
-      : trim(policy);
-  }
-
   function currencySymbol(currency) {
     var normalized = trim(currency).toUpperCase();
 
@@ -158,17 +149,33 @@
     );
   }
 
-  function describeTransportError(error) {
+  function parsePayload(data) {
+    if (
+      data &&
+      typeof data === "object"
+    ) {
+      return data;
+    }
+
+    return JSON.parse(
+      String(data || "")
+    );
+  }
+
+  function transportErrorText(error) {
     var message = "";
 
     if (typeof error === "string") {
       message = error;
-    } else if (error && typeof error === "object") {
+    } else if (
+      error &&
+      typeof error === "object"
+    ) {
       message =
         error.localizedDescription ||
         error.message ||
-        error.error ||
         error.reason ||
+        error.error ||
         "";
 
       if (!message) {
@@ -183,10 +190,10 @@
     message = trim(message);
 
     if (!message) {
-      return "连接失败";
+      return "网络连接失败";
     }
 
-    if (/timed?\s*out|timeout|超时/i.test(message)) {
+    if (/timeout|timed out|超时/i.test(message)) {
       return "连接超时";
     }
 
@@ -202,27 +209,10 @@
       return "策略组不存在或不可用";
     }
 
-    if (/network|connection|connect|socket|网络|连接/i.test(message)) {
-      return shortText(message, 28);
-    }
-
     return shortText(message, 28);
   }
 
-  function parsePayload(data) {
-    if (
-      data &&
-      typeof data === "object"
-    ) {
-      return data;
-    }
-
-    return JSON.parse(
-      String(data || "")
-    );
-  }
-
-  function apiErrorDetail(status, data) {
+  function apiErrorText(status, data) {
     var payload;
     var detail = "";
 
@@ -271,16 +261,16 @@
       return "余额接口不存在";
     }
 
+    if (status === 422) {
+      return "接口参数无效";
+    }
+
     if (status === 429) {
       return "请求过于频繁";
     }
 
-    if (status === 500) {
-      return "DeepSeek 服务器错误";
-    }
-
-    if (status === 503) {
-      return "DeepSeek 服务繁忙";
+    if (status >= 500) {
+      return "DeepSeek 服务暂时异常";
     }
 
     if (status > 0) {
@@ -368,8 +358,8 @@
       $done({
         title: PANEL_TITLE,
         content: [
-          "未返回余额明细",
-          "路由：" + shortText(routeText, 28),
+          "接口未返回余额明细",
+          "路由：" + routeText,
           "更新：" + nowText()
         ].join("\n"),
         style: "alert"
@@ -423,7 +413,7 @@
         "状态：" +
           statusText +
           " · " +
-          policyLabel(routeText) +
+          routeText +
           " · " +
           nowText()
       ].join("\n"),
@@ -431,42 +421,20 @@
     });
   }
 
-  function buildRoutes() {
-    var routes = [];
-    var primary = trim(PRIMARY_POLICY);
-    var fallback = trim(FALLBACK_POLICY);
-
-    routes.push(primary || "RULE");
-
-    if (
-      fallback &&
-      fallback.toUpperCase() !==
-        (primary || "RULE").toUpperCase()
-    ) {
-      routes.push(fallback);
-    }
-
-    return routes;
-  }
-
-  function requestBalance(
-    policy,
-    callback
-  ) {
+  function requestBalance(policy, callback) {
     var request = {
       url: BALANCE_URL,
       headers: {
         "Authorization": "Bearer " + API_KEY,
         "Accept": "application/json",
-        "Cache-Control": "no-cache",
-        "User-Agent": "Surge-DeepSeek-Balance/2.0"
+        "Cache-Control": "no-cache"
       },
-      timeout: 4,
+      timeout: 5,
       "auto-cookie": false,
       "auto-redirect": true
     };
 
-    if (!isRuleMode(policy)) {
+    if (policy) {
       request.policy = policy;
     }
 
@@ -490,131 +458,132 @@
     }
   }
 
-  function runAttempt(
-    routes,
-    index,
-    previousErrors
+  function processResponse(
+    error,
+    response,
+    data,
+    routeText,
+    allowFallback
   ) {
-    var route;
+    var status;
+    var payload;
 
     if (finished) {
       return;
     }
 
-    if (index >= routes.length) {
+    status = responseStatus(response);
+
+    if (error || status === 0) {
+      if (
+        allowFallback &&
+        PROXY_GROUP &&
+        !isUnresolvedPlaceholder(PROXY_GROUP)
+      ) {
+        requestBalance(
+          PROXY_GROUP,
+          function (
+            fallbackError,
+            fallbackResponse,
+            fallbackData
+          ) {
+            processResponse(
+              fallbackError,
+              fallbackResponse,
+              fallbackData,
+              PROXY_GROUP,
+              false
+            );
+          }
+        );
+
+        return;
+      }
+
       finishError(
-        previousErrors.join(" / ") ||
-          "所有路由均连接失败",
-        routes.map(policyLabel).join(" → ")
+        transportErrorText(error),
+        routeText
       );
 
       return;
     }
 
-    route = routes[index];
+    if (
+      status < 200 ||
+      status >= 300
+    ) {
+      finishError(
+        apiErrorText(status, data),
+        routeText
+      );
 
-    requestBalance(
-      route,
-      function (error, response, data) {
-        var status;
-        var payload;
-        var transportError;
+      return;
+    }
 
-        if (finished) {
-          return;
-        }
+    try {
+      payload = parsePayload(data);
+    } catch (parseError) {
+      finishError(
+        "返回数据格式错误",
+        routeText
+      );
 
-        status = responseStatus(response);
+      return;
+    }
 
-        if (error || status === 0) {
-          transportError =
-            describeTransportError(error);
+    if (
+      !payload ||
+      typeof payload !== "object" ||
+      !Array.isArray(payload.balance_infos)
+    ) {
+      finishError(
+        "接口未返回有效余额数据",
+        routeText
+      );
 
-          previousErrors.push(
-            policyLabel(route) +
-              "：" +
-              transportError
-          );
+      return;
+    }
 
-          runAttempt(
-            routes,
-            index + 1,
-            previousErrors
-          );
-
-          return;
-        }
-
-        if (
-          status < 200 ||
-          status >= 300
-        ) {
-          finishError(
-            apiErrorDetail(status, data),
-            policyLabel(route)
-          );
-
-          return;
-        }
-
-        try {
-          payload = parsePayload(data);
-        } catch (parseError) {
-          finishError(
-            "返回数据格式错误",
-            policyLabel(route)
-          );
-
-          return;
-        }
-
-        if (
-          !payload ||
-          typeof payload !== "object" ||
-          !Array.isArray(
-            payload.balance_infos
-          )
-        ) {
-          finishError(
-            "接口未返回有效余额数据",
-            policyLabel(route)
-          );
-
-          return;
-        }
-
-        finishSuccess(
-          payload,
-          policyLabel(route)
-        );
-      }
+    finishSuccess(
+      payload,
+      routeText
     );
   }
 
   if (
     !API_KEY ||
-    API_KEY === "replace_with_your_key"
+    API_KEY === "replace_with_your_key" ||
+    isUnresolvedPlaceholder(API_KEY)
   ) {
     finishError(
-      "尚未配置 DeepSeek API Key",
+      "模块中的 API Key 尚未正确替换",
       "未执行"
     );
 
     return;
   }
 
+  if (isUnresolvedPlaceholder(PROXY_GROUP)) {
+    PROXY_GROUP = "Proxy";
+  }
+
   globalTimer = setTimeout(function () {
     finishError(
       "整体请求超时",
-      buildRoutes()
-        .map(policyLabel)
-        .join(" → ")
+      "规则分流 → " + PROXY_GROUP
     );
-  }, 10000);
+  }, 10500);
 
-  runAttempt(
-    buildRoutes(),
-    0,
-    []
+  requestBalance(
+    "",
+    function (error, response, data) {
+      processResponse(
+        error,
+        response,
+        data,
+        "规则分流",
+        true
+      );
+    }
   );
 })();
