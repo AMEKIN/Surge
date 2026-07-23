@@ -37,17 +37,23 @@ https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/icons.json
 1. DNS 诊断与缓存维护模块  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/DNS-Status-Cache-Maintenance.sgmodule
 
-3. FINAL 命中监控  
+2. FINAL 命中监控  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/FINAL-Leak-Monitor.sgmodule
 
-5. Proxy 节点测速  
+3. Proxy 节点测速  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/Proxy-SpeedTest.sgmodule
 
-7. 流媒体解锁检测  
+4. 流媒体解锁检测  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/Stream-Group-Unlock.sgmodule
 
-9. 网络出口质量检测  
+5. 网络出口质量检测  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/proxy-ip.sgmodule
 
-11. 请求失败监控  
+6. 请求失败监控  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/Request-Failure-Monitor.sgmodule
+
+7. DeepSeek余额显示
+https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/modules/DeepSeek-Balance.sgmodule
+
+
+
