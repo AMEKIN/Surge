@@ -1,10 +1,10 @@
 #!name=DeepSeek 余额监控
-#!desc=手动查询 DeepSeek API 账户总余额、充值余额、赠送余额和可用状态。
+#!desc=手动查询 DeepSeek API 账户余额；优先按 Surge 规则分流，网络失败时自动尝试 Proxy。
 #!system=ios
-#!arguments=DEEPSEEK_API_KEY=replace_with_your_key&LOW_BALANCE=5&POLICY=Proxy
+#!arguments=DEEPSEEK_API_KEY=replace_with_your_key&PRIMARY_POLICY=RULE&FALLBACK_POLICY=Proxy&LOW_BALANCE=5
 
 [Panel]
-DeepSeek余额监控 = title="DeepSeek 余额",content="点击刷新查询",style=info,script-name=DeepSeek余额监控V1
+DeepSeek余额监控 = title="DeepSeek 余额",content="点击刷新查询",style=info,script-name=DeepSeek余额监控V2
 
 [Script]
-DeepSeek余额监控V1 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/deepseek-balance.js?v=20260723v1,argument=DEEPSEEK_API_KEY=%DEEPSEEK_API_KEY%&LOW_BALANCE=%LOW_BALANCE%&POLICY=%POLICY%,script-update-interval=3600,timeout=10,engine=webview
+DeepSeek余额监控V2 = type=generic,script-path=https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/scripts/deepseek-balance.js?v=20260723v2,argument=DEEPSEEK_API_KEY=%DEEPSEEK_API_KEY%&PRIMARY_POLICY=%PRIMARY_POLICY%&FALLBACK_POLICY=%FALLBACK_POLICY%&LOW_BALANCE=%LOW_BALANCE%,script-update-interval=3600,timeout=12,engine=jsc
