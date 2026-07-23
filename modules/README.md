@@ -15,3 +15,6 @@ proxy-ip.sgmodule
 
 6. 请求失败监控
 Request-Failure-Monitor.sgmodule
+
+7. DeepSeek余额显示  
+DeepSeek-Balance.sgmodule
