@@ -20,3 +20,6 @@ https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rules/MementoMori
 
 ドットアビス  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rules/Dottoabisu.list
+
+無職転生 〜異世界行ったら本気だす〜 【クロエコ】  
+https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rules/Kuroeko.list
