@@ -27,6 +27,10 @@ https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rules/MementoMori
 7. ドットアビス  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rules/Dottoabisu.list
 
+8. 無職転生 〜異世界行ったら本気だす〜 【クロエコ】  
+https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/rules/Kuroeko.list
+
+
 图标合集均来自于相对应的APP官方icon，图标尺寸统一为512x512，目前用于Surge能够正常使用，其他代理软件还没试过，不确定能不能够使用  
 图标合集订阅连接:  
 https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/icons.json
