@@ -1,0 +1,44 @@
+# Giffgaff App、账户、套餐、充值、SIM/eSIM、社区、帮助、
+# 网络状态、WiFi Extra 及官方关联服务
+# 仅包含 Giffgaff 自营或品牌专属域名，不包含共享第三方平台
+
+# ==============================
+# Giffgaff 核心服务
+# ==============================
+# 覆盖但不限于：
+# www.giffgaff.com
+# id.giffgaff.com
+# community.giffgaff.com
+# help.giffgaff.com
+# support2.giffgaff.com
+# status.giffgaff.com
+# news.giffgaff.com
+# mediacentre.giffgaff.com
+#
+# 主要用途：
+# App 登录与多重验证
+# 账户、余额、套餐与流量查询
+# 信用余额充值与套餐购买
+# SIM 激活、补卡与号码转入
+# eSIM 申请、下载、切换与激活
+# 网络覆盖与故障状态查询
+# 社区、帮助中心与客服工单
+# WiFi Extra 配置
+DOMAIN-SUFFIX,giffgaff.com
+
+# ==============================
+# Giffgaff 官方短链接
+# ==============================
+# App 下载、页面跳转及官方活动链接
+DOMAIN-SUFFIX,giff.ly
+
+# ==============================
+# Giffgaff 官方企业与媒体站点
+# ==============================
+# 新闻、媒体中心、招聘或企业内容
+DOMAIN-SUFFIX,giffgaff.io
+
+# ==============================
+# Giffgaff 手机回收与以旧换新
+# ==============================
+DOMAIN-SUFFIX,giffgaffrecycle.com
