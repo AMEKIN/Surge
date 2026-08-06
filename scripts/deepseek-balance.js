@@ -1,6 +1,11 @@
-// Surge Panel: DeepSeek Balance Monitor V3
-// 第一遍按照 Surge 现有规则分流。
-// 传输层连接失败时，再通过 PROXY_GROUP 指定的策略组重试。
+// Surge Panel: DeepSeek Balance Monitor V4
+//
+// 功能：
+// 1. 面板手动刷新余额。
+// 2. 每 30 分钟通过 cron 后台检查。
+// 3. 规则分流连接失败时，自动通过指定策略组重试。
+// 4. 总余额低于阈值时发送 Surge 通知。
+// 5. 使用持久化状态避免每 30 分钟重复通知。
 
 (function () {
   "use strict";
@@ -8,16 +13,37 @@
   var PANEL_TITLE = "DeepSeek 余额";
   var BALANCE_URL = "https://api.deepseek.com/user/balance";
 
+  var NOTIFY_STATE_KEY =
+    "deepseek_balance_monitor_v4_notify_state";
+
+  var LAST_RESULT_KEY =
+    "deepseek_balance_monitor_v4_last_result";
+
   var args = parseArguments(
     typeof $argument === "string" ? $argument : ""
   );
 
+  var MODE = trim(args.MODE).toLowerCase() || "panel";
   var API_KEY = trim(args.API_KEY);
   var PROXY_GROUP = trim(args.PROXY_GROUP) || "Proxy";
+
   var LOW_BALANCE = parseNonNegativeNumber(
     args.LOW_BALANCE,
     5
   );
+
+  var REMIND_HOURS = parseNonNegativeNumber(
+    args.REMIND_HOURS,
+    12
+  );
+
+  var IS_CRON =
+    MODE === "cron" ||
+    (
+      typeof $script !== "undefined" &&
+      $script &&
+      $script.type === "cron"
+    );
 
   var finished = false;
   var globalTimer = null;
@@ -58,7 +84,9 @@
 
   function trim(value) {
     return String(
-      value === null || value === undefined ? "" : value
+      value === null || value === undefined
+        ? ""
+        : value
     ).replace(/^\s+|\s+$/g, "");
   }
 
@@ -147,6 +175,39 @@
       currencySymbol(currency) +
       amount.toFixed(2)
     );
+  }
+
+  function readJson(key, fallback) {
+    var raw;
+    var parsed;
+
+    try {
+      raw = $persistentStore.read(key);
+
+      if (!raw) {
+        return fallback;
+      }
+
+      parsed = JSON.parse(raw);
+
+      return parsed &&
+        typeof parsed === "object"
+        ? parsed
+        : fallback;
+    } catch (ignore) {
+      return fallback;
+    }
+  }
+
+  function writeJson(key, value) {
+    try {
+      return $persistentStore.write(
+        JSON.stringify(value),
+        key
+      );
+    } catch (ignore) {
+      return false;
+    }
   }
 
   function parsePayload(data) {
@@ -275,10 +336,12 @@
 
     if (status > 0) {
       return detail
-        ? "HTTP " +
-            status +
-            "：" +
-            shortText(detail, 20)
+        ? (
+          "HTTP " +
+          status +
+          "：" +
+          shortText(detail, 20)
+        )
         : "HTTP " + status;
     }
 
@@ -308,8 +371,129 @@
     return list[0];
   }
 
+  function saveLatestResult(
+    total,
+    toppedUp,
+    granted,
+    currency,
+    available,
+    routeText
+  ) {
+    writeJson(
+      LAST_RESULT_KEY,
+      {
+        total_balance: total,
+        topped_up_balance: toppedUp,
+        granted_balance: granted,
+        currency: currency,
+        is_available: available,
+        route: routeText,
+        updated_at: Date.now()
+      }
+    );
+  }
+
+  function resetLowBalanceState() {
+    writeJson(
+      NOTIFY_STATE_KEY,
+      {
+        is_low: false,
+        last_notified_at: 0,
+        last_balance: null
+      }
+    );
+  }
+
+  function maybeSendLowBalanceNotification(
+    total,
+    currency
+  ) {
+    var isLow = total < LOW_BALANCE;
+    var now = Date.now();
+
+    var cooldownMilliseconds =
+      REMIND_HOURS * 60 * 60 * 1000;
+
+    var state = readJson(
+      NOTIFY_STATE_KEY,
+      {
+        is_low: false,
+        last_notified_at: 0,
+        last_balance: null
+      }
+    );
+
+    var lastNotifiedAt = Number(
+      state.last_notified_at || 0
+    );
+
+    var shouldNotify =
+      isLow &&
+      (
+        state.is_low !== true ||
+        REMIND_HOURS === 0 ||
+        now - lastNotifiedAt >=
+          cooldownMilliseconds
+      );
+
+    if (!isLow) {
+      resetLowBalanceState();
+      return;
+    }
+
+    if (shouldNotify) {
+      try {
+        $notification.post(
+          "DeepSeek 余额不足",
+          "当前总余额：" +
+            formatMoney(total, currency),
+          "余额已低于 " +
+            formatMoney(
+              LOW_BALANCE,
+              currency
+            ) +
+            "，请及时充值。",
+          {
+            sound: true
+          }
+        );
+      } catch (ignore) {}
+    }
+
+    writeJson(
+      NOTIFY_STATE_KEY,
+      {
+        is_low: true,
+        last_notified_at:
+          shouldNotify
+            ? now
+            : lastNotifiedAt,
+        last_balance: total
+      }
+    );
+  }
+
+  function finishCron() {
+    if (finished) {
+      return;
+    }
+
+    finished = true;
+
+    if (globalTimer) {
+      clearTimeout(globalTimer);
+    }
+
+    $done();
+  }
+
   function finishError(message, routeText) {
     if (finished) {
+      return;
+    }
+
+    if (IS_CRON) {
+      finishCron();
       return;
     }
 
@@ -322,9 +506,12 @@
     $done({
       title: PANEL_TITLE,
       content: [
-        "查询失败：" + shortText(message, 29),
-        "路由：" + shortText(routeText, 28),
-        "更新：" + nowText()
+        "查询失败：" +
+          shortText(message, 29),
+        "路由：" +
+          shortText(routeText, 28),
+        "更新：" +
+          nowText()
       ].join("\n"),
       style: "error"
     });
@@ -344,26 +531,15 @@
       return;
     }
 
-    finished = true;
-
-    if (globalTimer) {
-      clearTimeout(globalTimer);
-    }
-
     balance = selectBalanceInfo(
       payload.balance_infos
     );
 
     if (!balance) {
-      $done({
-        title: PANEL_TITLE,
-        content: [
-          "接口未返回余额明细",
-          "路由：" + routeText,
-          "更新：" + nowText()
-        ].join("\n"),
-        style: "alert"
-      });
+      finishError(
+        "接口未返回余额明细",
+        routeText
+      );
 
       return;
     }
@@ -388,10 +564,35 @@
     available =
       payload.is_available === true;
 
+    saveLatestResult(
+      total,
+      toppedUp,
+      granted,
+      currency,
+      available,
+      routeText
+    );
+
+    maybeSendLowBalanceNotification(
+      total,
+      currency
+    );
+
+    if (IS_CRON) {
+      finishCron();
+      return;
+    }
+
+    finished = true;
+
+    if (globalTimer) {
+      clearTimeout(globalTimer);
+    }
+
     if (!available) {
       style = "error";
       statusText = "余额不足或不可调用";
-    } else if (total <= LOW_BALANCE) {
+    } else if (total < LOW_BALANCE) {
       style = "alert";
       statusText = "余额偏低";
     } else {
@@ -425,7 +626,8 @@
     var request = {
       url: BALANCE_URL,
       headers: {
-        "Authorization": "Bearer " + API_KEY,
+        "Authorization":
+          "Bearer " + API_KEY,
         "Accept": "application/json",
         "Cache-Control": "no-cache"
       },
@@ -534,7 +736,9 @@
     if (
       !payload ||
       typeof payload !== "object" ||
-      !Array.isArray(payload.balance_infos)
+      !Array.isArray(
+        payload.balance_infos
+      )
     ) {
       finishError(
         "接口未返回有效余额数据",
@@ -556,7 +760,7 @@
     isUnresolvedPlaceholder(API_KEY)
   ) {
     finishError(
-      "模块中的 API Key 尚未正确替换",
+      "模块中的 API Key 尚未正确配置",
       "未执行"
     );
 
@@ -567,12 +771,15 @@
     PROXY_GROUP = "Proxy";
   }
 
-  globalTimer = setTimeout(function () {
-    finishError(
-      "整体请求超时",
-      "规则分流 → " + PROXY_GROUP
-    );
-  }, 10500);
+  globalTimer = setTimeout(
+    function () {
+      finishError(
+        "整体请求超时",
+        "规则分流 → " + PROXY_GROUP
+      );
+    },
+    10500
+  );
 
   requestBalance(
     "",
