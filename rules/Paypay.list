@@ -1,0 +1,80 @@
+# PayPay App / Web / API / 支付 / 登录 / 账户 / 二维码 /
+# P2P 转账 / Mini App / PayPay 金融服务
+
+# ============================================================
+# PayPay 核心服务
+# ============================================================
+
+# PayPay 主域
+# 已覆盖但不限于：
+# www.paypay.ne.jp
+# pay.paypay.ne.jp
+# qr.paypay.ne.jp
+# api.paypay.ne.jp
+# apigw.paypay.ne.jp
+# apigw.stg.paypay.ne.jp
+# apigw.sandbox.paypay.ne.jp
+# static.paypay.ne.jp
+# cdn.assets.paypay.ne.jp
+# sentry.platform.paypay.ne.jp
+# developer.paypay.ne.jp
+#
+# 用途：
+# App 核心 API
+# 登录与账户
+# 支付、退款、余额
+# P2P 转账
+# 二维码
+# Mini App
+# Open Payment API
+# 静态资源与 WebView
+DOMAIN-SUFFIX,paypay.ne.jp
+
+
+# ============================================================
+# PayPay Corporation / App 跳转 / QR / 账户联动
+# ============================================================
+
+# 已知包括：
+# www.paypay-corp.co.jp
+# static.paypay-corp.co.jp
+# qr.paypay-corp.co.jp
+# qr-stg.paypay-corp.co.jp
+#
+# PayPay 官方账户联动、支付登录 URL、
+# App/Web 跳转以及官方邮件等会使用该域
+DOMAIN-SUFFIX,paypay-corp.co.jp
+
+
+# ============================================================
+# PayPay Card / PayPay Credit
+# ============================================================
+
+# PayPay App 内可直接查看、管理 PayPay Card / PayPay Credit
+DOMAIN-SUFFIX,paypay-card.co.jp
+
+
+# ============================================================
+# PayPay Bank / PayPay Debit
+# ============================================================
+
+# PayPay App 可显示 PayPay 银行账户余额，
+# 并可通过 PayPay Debit 使用银行余额支付
+DOMAIN-SUFFIX,paypay-bank.co.jp
+
+
+# ============================================================
+# PayPay Securities
+# ============================================================
+
+# PayPay App 内置 PayPay证券 Mini App
+# 覆盖股票、基金、NISA、账户管理等
+DOMAIN-SUFFIX,paypay-sec.co.jp
+
+
+# ============================================================
+# PayPay Insurance
+# ============================================================
+
+# PayPay App 内提供 PayPayほけん / App 专用保险
+DOMAIN-SUFFIX,paypay-insurance.co.jp
