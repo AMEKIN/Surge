@@ -185,5 +185,9 @@
       "name": "FlowerCloud.png",
       "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/FlowerCloud.png"
     },
+    {
+      "name": "Tailscale.png",
+      "url": "https://raw.githubusercontent.com/AMEKIN/Surge/refs/heads/main/icons/Tailscale.png"
+    },
          ]
 }
