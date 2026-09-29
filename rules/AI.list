@@ -108,3 +108,62 @@ DOMAIN,cp4.cloudflare.com
 # Apple Intelligence Extensions
 DOMAIN,apple-relay.apple.com
 DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com
+
+# ============================================================
+# Claude / Anthropic
+# Updated: 2026-09-29
+# ============================================================
+
+# Anthropic 核心
+# 覆盖：
+# api.anthropic.com
+# a-api.anthropic.com
+# a-cdn.anthropic.com
+# s-cdn.anthropic.com
+# assets-proxy.anthropic.com
+# mcp-proxy.anthropic.com
+# statsig.anthropic.com
+# status.anthropic.com
+# support.anthropic.com
+DOMAIN-SUFFIX,anthropic.com
+
+# Claude Web / App / Desktop / Claude Code
+# 覆盖：
+# claude.ai
+# api.claude.ai
+# assets.claude.ai
+# downloads.claude.ai
+# a.claude.ai
+# a-cdn.claude.ai
+# *.livepreview.claude.ai
+DOMAIN-SUFFIX,claude.ai
+
+# Claude 新平台、OAuth、Console、文档
+# 覆盖：
+# platform.claude.com
+# code.claude.com
+# docs.claude.com
+# support.claude.com
+DOMAIN-SUFFIX,claude.com
+
+# Claude Desktop / Live Preview / App 内容
+# 覆盖动态生成的 *.livepreview.claude.app
+DOMAIN-SUFFIX,claude.app
+
+# Artifacts / 文件预览 / Claude in Chrome WebSocket Bridge
+# 覆盖：
+# bridge.claudeusercontent.com
+# *.frame.claudeusercontent.com
+# 其他动态用户内容子域
+DOMAIN-SUFFIX,claudeusercontent.com
+
+# Claude MCP App / MCP 内容渲染
+# 官方要求允许动态 *.claudemcpcontent.com
+DOMAIN-SUFFIX,claudemcpcontent.com
+
+# ============================================================
+# Claude 官方开发者内容（可选，但建议加入）
+# ============================================================
+
+# Anthropic 官方 Claude 开发者博客 / 技术资料
+DOMAIN-SUFFIX,claude.dev
