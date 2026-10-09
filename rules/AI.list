@@ -115,50 +115,21 @@ DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com
 # ============================================================
 
 # Anthropic 核心
-# 覆盖：
-# api.anthropic.com
-# a-api.anthropic.com
-# a-cdn.anthropic.com
-# s-cdn.anthropic.com
-# assets-proxy.anthropic.com
-# mcp-proxy.anthropic.com
-# statsig.anthropic.com
-# status.anthropic.com
-# support.anthropic.com
 DOMAIN-SUFFIX,anthropic.com
 
 # Claude Web / App / Desktop / Claude Code
-# 覆盖：
-# claude.ai
-# api.claude.ai
-# assets.claude.ai
-# downloads.claude.ai
-# a.claude.ai
-# a-cdn.claude.ai
-# *.livepreview.claude.ai
 DOMAIN-SUFFIX,claude.ai
 
 # Claude 新平台、OAuth、Console、文档
-# 覆盖：
-# platform.claude.com
-# code.claude.com
-# docs.claude.com
-# support.claude.com
 DOMAIN-SUFFIX,claude.com
 
 # Claude Desktop / Live Preview / App 内容
-# 覆盖动态生成的 *.livepreview.claude.app
 DOMAIN-SUFFIX,claude.app
 
 # Artifacts / 文件预览 / Claude in Chrome WebSocket Bridge
-# 覆盖：
-# bridge.claudeusercontent.com
-# *.frame.claudeusercontent.com
-# 其他动态用户内容子域
 DOMAIN-SUFFIX,claudeusercontent.com
 
 # Claude MCP App / MCP 内容渲染
-# 官方要求允许动态 *.claudemcpcontent.com
 DOMAIN-SUFFIX,claudemcpcontent.com
 
 # ============================================================
@@ -167,3 +138,26 @@ DOMAIN-SUFFIX,claudemcpcontent.com
 
 # Anthropic 官方 Claude 开发者博客 / 技术资料
 DOMAIN-SUFFIX,claude.dev
+
+# 插件、依赖、更新及发行说明
+DOMAIN,storage.googleapis.com
+DOMAIN,registry.npmjs.org
+DOMAIN,github.com
+DOMAIN,raw.githubusercontent.com
+DOMAIN,formulae.brew.sh
+
+# 使用 googlesource 项目时的 Gerrit 查询
+DOMAIN-WILDCARD,*-review.googlesource.com
+
+# 可选遥测与错误报告
+DOMAIN,http-intake.logs.us5.datadoghq.com
+DOMAIN,browser-intake-us5-datadoghq.com
+
+# Artifact 的字体和第三方脚本统一走 AI
+DOMAIN,fonts.googleapis.com
+DOMAIN,fonts.gstatic.com
+DOMAIN,cdnjs.cloudflare.com
+DOMAIN,cdn.jsdelivr.net
+DOMAIN,cdn.tailwindcss.com
+DOMAIN,code.jquery.com
+DOMAIN,unpkg.com
