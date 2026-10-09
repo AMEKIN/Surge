@@ -8,6 +8,11 @@ DOMAIN-SUFFIX,apple.com.cn
 DOMAIN-SUFFIX,apple.cn
 DOMAIN-SUFFIX,safebrowsing.apple
 
+# Apple 2026-10-9 更新 Telegram 通知推送
+DOMAIN-SUFFIX,push.apple.com
+DOMAIN-SUFFIX,akadns.net
+DOMAIN-SUFFIX,apple.com.edgekey.net
+
 # iCloud
 DOMAIN-SUFFIX,icloud.com
 DOMAIN-SUFFIX,icloud.com.cn
